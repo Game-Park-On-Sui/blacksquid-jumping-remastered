@@ -22,7 +22,9 @@ export default function Home() {
                 </div>
             </div>
             <div className="absolute w-[960px] h-[540px] 2xl:w-[1280px] 2xl:h-[720px]  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-                <div className="w-full h-full border-2 border-[#0a0e0f]"></div>
+                <div className="w-full h-full border-2 border-[#0a0e0f]">
+                    <iframe src="http://192.168.31.189:7456" className="w-full h-full"></iframe>
+                </div>
                 {/* left */}
                 {/*<div className="fixed w-28 h-full border-2 border-[#0a0e0f] top-0 -left-36 flex flex-col justify-center gap-6 items-center">*/}
                 {/*    <span>NewGame</span>*/}
