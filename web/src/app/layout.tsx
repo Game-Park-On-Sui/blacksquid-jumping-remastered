@@ -2,6 +2,8 @@ import {ReactNode} from "react";
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
+import CustomProvider from "@/providers";
+import CustomContextProvider from "@/contexts";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -22,8 +24,12 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: Readonly<{ children: ReactNode }>) {
     return (
         <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                {children}
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased select-none`}>
+                <CustomProvider>
+                    <CustomContextProvider>
+                        {children}
+                    </CustomContextProvider>
+                </CustomProvider>
             </body>
         </html>
     );
