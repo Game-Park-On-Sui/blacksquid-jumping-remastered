@@ -44,5 +44,11 @@ export class Player extends Component {
         this.targetZ = JumpZList[index];
         this.speed = (this.targetZ - this.node.getPosition().z) / this.getJumpDuration();
     }
+
+    die(oldIndex: number) {
+        this.jump.play();
+        this.targetZ = oldIndex === -1 ? 0 : JumpZList[oldIndex];
+        this.speed = (this.targetZ - this.node.getPosition().z) / this.getJumpDuration();
+    }
 }
 
