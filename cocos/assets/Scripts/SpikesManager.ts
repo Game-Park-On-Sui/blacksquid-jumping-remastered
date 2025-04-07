@@ -30,6 +30,7 @@ export class SpikesManager extends Component {
     private oldRow: number = -1;
     private curRow: number = -1;
     private curList: number = 0;
+    private lastSpikePosX: number = 0;
 
     start() {
         for (let i = 0; i < this.spikesCount; i++) {
@@ -41,6 +42,7 @@ export class SpikesManager extends Component {
             this.isVisibleSpikes.push(true);
             this.spikesUpSpeed.push(0);
         }
+        this.lastSpikePosX = 19;
     }
 
     update(deltaTime: number) {
@@ -49,11 +51,15 @@ export class SpikesManager extends Component {
         this.timer -= deltaTime;
         if (this.timer <= 0) {
             this.startPlatform.setPosition(Math.round(this.startPlatform.getPosition().x), 0, 0);
+            let curLastSpikePosX = -6;
             for (let i = 0; i < this.spikesCount; i++)
                 if (this.isVisibleSpikes[i]) {
-                    this.spikes[i].setPosition(Math.round(this.spikes[i].getPosition().x), 0, 0);
+                    const pos = this.spikes[i].getPosition();
+                    this.spikes[i].setPosition(Math.round(pos.x), 0, 0);
                     this.spikesUpSpeed[i] = 0;
+                    curLastSpikePosX = Math.max(curLastSpikePosX, Math.round(pos.x));
                 }
+            this.lastSpikePosX = curLastSpikePosX;
             this.endPlatform.setPosition(Math.round(this.endPlatform.getPosition().x), 0, 0);
             if (this.killOne !== -1) {
                 this.showSpikes();
@@ -136,11 +142,11 @@ export class SpikesManager extends Component {
         if (visibleNumber - 5 < this.spikesCount - this.curList) {
             const idx = this.spikes.findIndex((_, index) => !this.isVisibleSpikes[index]);
             const spike = this.spikes[idx];
-            spike.setPosition(visibleNumber - 5 - 1, -2, 0);
+            spike.setPosition(this.lastSpikePosX + 1, -2, 0);
             this.innerHiddenSpikes(spike);
             this.isVisibleSpikes[idx] = true;
             this.spikesUpSpeed[idx] = 2 / this.timer;
-            this.fixEndPlatformPos(visibleNumber - 5 - 1);
+            this.fixEndPlatformPos(this.lastSpikePosX + 1);
         }
     }
 
