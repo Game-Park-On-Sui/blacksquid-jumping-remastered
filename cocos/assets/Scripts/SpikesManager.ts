@@ -21,12 +21,15 @@ export class SpikesManager extends Component {
     hiddenSpikesMesh: Mesh = null;
 
     private spikes: Node[] = [];
+    private isVisibleSpikes: boolean[] = [];
     private direction: 1 | -1 = -1;
     private speed: number = 1;
+    private spikesUpSpeed: number[] = [];
     private timer: number = 0;
     private killOne: number = 0;
     private oldRow: number = -1;
     private curRow: number = -1;
+    private curList: number = 0;
 
     start() {
         for (let i = 0; i < this.spikesCount; i++) {
@@ -35,6 +38,8 @@ export class SpikesManager extends Component {
             spike.setPosition(i, 0, 0);
             spike.active = true;
             this.spikes.push(spike);
+            this.isVisibleSpikes.push(true);
+            this.spikesUpSpeed.push(0);
         }
     }
 
@@ -45,7 +50,10 @@ export class SpikesManager extends Component {
         if (this.timer <= 0) {
             this.startPlatform.setPosition(Math.round(this.startPlatform.getPosition().x), 0, 0);
             for (let i = 0; i < this.spikesCount; i++)
-                this.spikes[i].setPosition(Math.round(this.spikes[i].getPosition().x), 0, 0);
+                if (this.isVisibleSpikes[i]) {
+                    this.spikes[i].setPosition(Math.round(this.spikes[i].getPosition().x), 0, 0);
+                    this.spikesUpSpeed[i] = 0;
+                }
             this.endPlatform.setPosition(Math.round(this.endPlatform.getPosition().x), 0, 0);
             if (this.killOne !== -1) {
                 this.showSpikes();
@@ -55,10 +63,22 @@ export class SpikesManager extends Component {
             }
             return;
         }
-        this.startPlatform.setPosition(this.startPlatform.getPosition().x + this.direction * this.speed * deltaTime, 0, 0);
+        const startPlatformPos = this.startPlatform.getPosition();
+        if (startPlatformPos.x > -6)
+            this.startPlatform.setPosition(startPlatformPos.x + this.direction * this.speed * deltaTime, 0, 0);
+        let canMoveEndPlatform = true;
         for (let i = 0; i < this.spikesCount; i++)
-            this.spikes[i].setPosition(this.spikes[i].getPosition().x + this.direction * this.speed * deltaTime, 0, 0);
-        this.endPlatform.setPosition(this.endPlatform.getPosition().x + this.direction * this.speed * deltaTime, 0, 0);
+            if (this.isVisibleSpikes[i]) {
+                const pos = this.spikes[i].getPosition();
+                this.spikes[i].setPosition(pos.x + this.direction * this.speed * deltaTime, pos.y + this.spikesUpSpeed[i] * deltaTime, 0);
+                if (this.spikesUpSpeed[i] > 0)
+                    canMoveEndPlatform = false;
+            }
+        this.endPlatform.setPosition(this.endPlatform.getPosition().x + this.direction * this.speed * deltaTime * (canMoveEndPlatform ? 1 : 2), 0, 0);
+    }
+
+    lateUpdate() {
+        this.moveSpikesToEnd();
     }
 
     ChangeMoveDirection(direction: 1 | -1) {
@@ -83,14 +103,22 @@ export class SpikesManager extends Component {
         this.spikes.find(spike => spike.getPosition().x === -1).getChildByName(this.killOne.toString()).getChildByName("Spikes").getComponent(MeshRenderer).mesh = this.showSpikesMesh;
     }
 
+    innerHiddenSpikes(spike: Node) {
+        spike.getChildByName("0").getChildByName("Spikes").getComponent(MeshRenderer).mesh = this.hiddenSpikesMesh;
+        spike.getChildByName("1").getChildByName("Spikes").getComponent(MeshRenderer).mesh = this.hiddenSpikesMesh;
+    }
+
     hiddenSpikes() {
-        this.spikes.find(spike => spike.getPosition().x === 0).getChildByName("0").getChildByName("Spikes").getComponent(MeshRenderer).mesh = this.hiddenSpikesMesh;
-        this.spikes.find(spike => spike.getPosition().x === 0).getChildByName("1").getChildByName("Spikes").getComponent(MeshRenderer).mesh = this.hiddenSpikesMesh;
+        this.innerHiddenSpikes(this.spikes.find(spike => spike.getPosition().x === 0));
     }
 
     checkAlive() {
         if (this.curRow != this.killOne) {
             this.oldRow = this.curRow;
+            this.curList++;
+            for (let i = 0; i < this.spikesCount; i++)
+                if (this.isVisibleSpikes[i])
+                    this.isVisibleSpikes[i] = Math.round(this.spikes[i].getPosition().x) !== -6;
             return;
         }
         this.ChangeMoveDirection(1);
@@ -98,6 +126,26 @@ export class SpikesManager extends Component {
         this.timer = this.player.getJumpDuration();
         this.killOne = -1;
         this.player.die(this.oldRow);
+        this.spikesCount++;
+    }
+
+    moveSpikesToEnd() {
+        const visibleNumber = this.isVisibleSpikes.filter(visible => visible).length;
+        if (visibleNumber > 15)
+            return;
+        if (visibleNumber - 5 < this.spikesCount - this.curList) {
+            const idx = this.spikes.findIndex((_, index) => !this.isVisibleSpikes[index]);
+            const spike = this.spikes[idx];
+            spike.setPosition(visibleNumber - 5 - 1, -2, 0);
+            this.innerHiddenSpikes(spike);
+            this.isVisibleSpikes[idx] = true;
+            this.spikesUpSpeed[idx] = 2 / this.timer;
+            this.fixEndPlatformPos(visibleNumber - 5 - 1);
+        }
+    }
+
+    fixEndPlatformPos(fixedX: number) {
+        this.endPlatform.setPosition(fixedX, 0, 0);
     }
 }
 
