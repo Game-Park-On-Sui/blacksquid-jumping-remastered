@@ -1,4 +1,4 @@
-import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch} from 'cc';
+import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch, Label} from 'cc';
 import {Player} from "db://assets/Scripts/Player";
 
 const {ccclass, property} = _decorator;
@@ -19,6 +19,14 @@ export class SpikesManager extends Component {
     showSpikesMesh: Mesh = null;
     @property({type: Mesh})
     hiddenSpikesMesh: Mesh = null;
+    @property({type: Label})
+    curPosLabel: Label = null;
+    @property({type: Label})
+    curPosAwardLabel: Label = null;
+    @property({type: Label})
+    totalPosLabel: Label = null;
+    @property({type: Label})
+    totalAwardLabel: Label = null;
 
     private spikes: Node[] = [];
     private isVisibleSpikes: boolean[] = [];
@@ -43,6 +51,10 @@ export class SpikesManager extends Component {
             this.spikesUpSpeed.push(0);
         }
         this.lastSpikePosX = 19;
+        this.curPosLabel.string = this.curList.toString();
+        this.curPosAwardLabel.string = "0";
+        this.totalPosLabel.string = this.spikesCount.toString();
+        this.totalAwardLabel.string = "100";
     }
 
     update(deltaTime: number) {
@@ -102,7 +114,8 @@ export class SpikesManager extends Component {
     }
 
     randomKill() {
-        return Math.floor(Math.random() * 2);
+        return 1;
+        // return Math.floor(Math.random() * 2);
     }
 
     showSpikes() {
@@ -122,6 +135,7 @@ export class SpikesManager extends Component {
         if (this.curRow != this.killOne) {
             this.oldRow = this.curRow;
             this.curList++;
+            this.curPosLabel.string = this.curList.toString();
             for (let i = 0; i < this.spikesCount; i++)
                 if (this.isVisibleSpikes[i])
                     this.isVisibleSpikes[i] = Math.round(this.spikes[i].getPosition().x) !== -6;
@@ -133,6 +147,7 @@ export class SpikesManager extends Component {
         this.killOne = -1;
         this.player.die(this.oldRow);
         this.spikesCount++;
+        this.totalPosLabel.string = this.spikesCount.toString();
     }
 
     moveSpikesToEnd() {
