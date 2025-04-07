@@ -114,8 +114,7 @@ export class SpikesManager extends Component {
     }
 
     randomKill() {
-        return 1;
-        // return Math.floor(Math.random() * 2);
+        return Math.floor(Math.random() * 2);
     }
 
     showSpikes() {
