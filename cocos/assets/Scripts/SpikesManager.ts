@@ -1,5 +1,6 @@
 import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch, Label} from 'cc';
 import {Player} from "db://assets/Scripts/Player";
+import {ReStartButton} from "db://assets/Scripts/ReStartButton";
 
 const {ccclass, property} = _decorator;
 
@@ -27,6 +28,8 @@ export class SpikesManager extends Component {
     totalPosLabel: Label = null;
     @property({type: Label})
     totalAwardLabel: Label = null;
+    @property({type: ReStartButton})
+    restartButton: ReStartButton = null;
 
     private spikes: Node[] = [];
     private isVisibleSpikes: boolean[] = [];
@@ -64,7 +67,7 @@ export class SpikesManager extends Component {
         if (this.timer <= 0) {
             this.startPlatform.setPosition(Math.round(this.startPlatform.getPosition().x), 0, 0);
             let curLastSpikePosX = -6;
-            for (let i = 0; i < this.spikesCount; i++)
+            for (let i = 0; i < 20; i++)
                 if (this.isVisibleSpikes[i]) {
                     const pos = this.spikes[i].getPosition();
                     this.spikes[i].setPosition(Math.round(pos.x), 0, 0);
@@ -85,14 +88,14 @@ export class SpikesManager extends Component {
         if (startPlatformPos.x > -6)
             this.startPlatform.setPosition(startPlatformPos.x + this.direction * this.speed * deltaTime, 0, 0);
         let canMoveEndPlatform = true;
-        for (let i = 0; i < this.spikesCount; i++)
+        for (let i = 0; i < 20; i++)
             if (this.isVisibleSpikes[i]) {
                 const pos = this.spikes[i].getPosition();
                 this.spikes[i].setPosition(pos.x + this.direction * this.speed * deltaTime, pos.y + this.spikesUpSpeed[i] * deltaTime, 0);
                 if (this.spikesUpSpeed[i] > 0)
                     canMoveEndPlatform = false;
             }
-        this.endPlatform.setPosition(this.endPlatform.getPosition().x + this.direction * this.speed * deltaTime * (canMoveEndPlatform ? 1 : 2), 0, 0);
+        this.endPlatform.setPosition(this.endPlatform.getPosition().x + this.direction * this.speed * deltaTime * (canMoveEndPlatform ? 1 : (this.direction === -1 ? 0 : 2)), 0, 0);
     }
 
     lateUpdate() {
@@ -114,7 +117,8 @@ export class SpikesManager extends Component {
     }
 
     randomKill() {
-        return Math.floor(Math.random() * 2);
+        return 1;
+        // return Math.floor(Math.random() * 2);
     }
 
     showSpikes() {
@@ -135,9 +139,10 @@ export class SpikesManager extends Component {
             this.oldRow = this.curRow;
             this.curList++;
             this.curPosLabel.string = this.curList.toString();
-            for (let i = 0; i < this.spikesCount; i++)
+            for (let i = 0; i < 20; i++)
                 if (this.isVisibleSpikes[i])
                     this.isVisibleSpikes[i] = Math.round(this.spikes[i].getPosition().x) !== -6;
+            this.checkWin();
             return;
         }
         this.ChangeMoveDirection(1);
@@ -159,13 +164,41 @@ export class SpikesManager extends Component {
             spike.setPosition(this.lastSpikePosX + 1, -2, 0);
             this.innerHiddenSpikes(spike);
             this.isVisibleSpikes[idx] = true;
-            this.spikesUpSpeed[idx] = 2 / this.timer;
+            this.spikesUpSpeed[idx] = 2 / (this.timer > 0 ? this.timer : this.player.getJumpDuration());
             this.fixEndPlatformPos(this.lastSpikePosX + 1);
         }
     }
 
     fixEndPlatformPos(fixedX: number) {
         this.endPlatform.setPosition(fixedX, 0, 0);
+    }
+
+    checkWin() {
+        if (this.curList !== this.spikesCount)
+            return;
+        this.restartButton.showReStart();
+    }
+
+    handleStart(curPos: number, curPosAward: number, totalPos: number, totalAward: number) {
+        for (let i = 0; i < 20; i++) {
+            const spike = this.spikes[i];
+            spike.setPosition(i, 0, 0);
+            this.isVisibleSpikes[i] = true;
+            this.spikesUpSpeed[i] = 0;
+            this.innerHiddenSpikes(spike);
+        }
+        this.curList = curPos;
+        this.curPosLabel.string = this.curList.toString();
+        this.curPosAwardLabel.string = curPosAward.toString();
+        this.spikesCount = totalPos;
+        this.totalPosLabel.string = this.spikesCount.toString();
+        this.totalAwardLabel.string = totalAward.toString();
+        this.oldRow = -1;
+        this.curRow = -1;
+        this.startPlatform.setPosition(-1, 0, 0);
+        this.lastSpikePosX = 19;
+        this.fixEndPlatformPos(this.lastSpikePosX + 1);
+        this.player.node.setPosition(-1, 0.1, 0);
     }
 }
 
