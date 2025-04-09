@@ -12,6 +12,10 @@
     {
       "name": "GAME",
       "value": 1
+    },
+    {
+      "name": "BG",
+      "value": 2
     }
   ]
 }
