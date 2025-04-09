@@ -155,11 +155,13 @@ export class SpikesManager extends Component {
     }
 
     moveSpikesToEnd() {
-        const visibleNumber = this.isVisibleSpikes.filter(visible => visible).length;
+        const visibleNumber = this.calcVisibleNumber();
         if (visibleNumber > 15)
             return;
-        if (visibleNumber - 5 < this.spikesCount - this.curList) {
+        if (visibleNumber < this.spikesCount - this.curList) {
             const idx = this.spikes.findIndex((_, index) => !this.isVisibleSpikes[index]);
+            if (idx === -1)
+                return;
             const spike = this.spikes[idx];
             spike.setPosition(this.lastSpikePosX + 1, -2, 0);
             this.innerHiddenSpikes(spike);
@@ -167,6 +169,13 @@ export class SpikesManager extends Component {
             this.spikesUpSpeed[idx] = 2 / (this.timer > 0 ? this.timer : this.player.getJumpDuration());
             this.fixEndPlatformPos(this.lastSpikePosX + 1);
         }
+    }
+
+    calcVisibleNumber() {
+        let cnt = 0;
+        for (let i = 0; i < 20; i++)
+            cnt += this.spikes[i].getPosition().x > -1 ? 1 : 0;
+        return cnt;
     }
 
     fixEndPlatformPos(fixedX: number) {
@@ -180,10 +189,11 @@ export class SpikesManager extends Component {
     }
 
     handleStart(curPos: number, curPosAward: number, totalPos: number, totalAward: number) {
+        const lastPos = totalPos - curPos;
         for (let i = 0; i < 20; i++) {
             const spike = this.spikes[i];
-            spike.setPosition(i, 0, 0);
-            this.isVisibleSpikes[i] = true;
+            spike.setPosition(i < lastPos ? i : -6, 0, 0);
+            this.isVisibleSpikes[i] = i < lastPos;
             this.spikesUpSpeed[i] = 0;
             this.innerHiddenSpikes(spike);
         }
@@ -196,7 +206,7 @@ export class SpikesManager extends Component {
         this.oldRow = -1;
         this.curRow = -1;
         this.startPlatform.setPosition(-1, 0, 0);
-        this.lastSpikePosX = 19;
+        this.lastSpikePosX = lastPos - 1;
         this.fixEndPlatformPos(this.lastSpikePosX + 1);
         this.player.node.setPosition(-1, 0.1, 0);
     }
