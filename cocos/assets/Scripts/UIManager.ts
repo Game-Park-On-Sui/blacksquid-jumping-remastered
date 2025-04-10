@@ -1,5 +1,6 @@
 import {_decorator, Component, Node} from 'cc';
 import {SpikesManager} from "db://assets/Scripts/SpikesManager";
+import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
 
 const {ccclass, property} = _decorator;
 
@@ -17,6 +18,7 @@ export class UIManager extends Component {
     handleClickLogin() {
         this.login.active = false;
         this.startButton.active = true;
+        TsrpcManager.instance.login().then();
     }
 
     handleClickStart() {

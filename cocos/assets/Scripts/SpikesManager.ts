@@ -61,7 +61,6 @@ export class SpikesManager extends Component {
     }
 
     update(deltaTime: number) {
-        console.log("0x9e4092b6a894e6b168aa1c6c009f5c1c1fcb83fb95e5aa39144e1d2be4ee0d67".length);
         if (this.timer <= 0)
             return;
         this.timer -= deltaTime;
