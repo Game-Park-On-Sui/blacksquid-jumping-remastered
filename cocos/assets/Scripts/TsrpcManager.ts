@@ -16,11 +16,11 @@ export class TsrpcManager {
         return this._instance;
     }
 
-    async login() {
+    async login(username: string, password: string, address: string) {
         const res = await this._apiClient.callApi("Login", {
-            username: "Debirth",
-            password: "DePasskey",
-            address: "0x9e4092b6a894e6b168aa1c6c009f5c1c1fcb83fb95e5aa39144e1d2be4ee0d67"
+            username,
+            password,
+            address
         });
         console.log(res.res.state);
     }

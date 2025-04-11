@@ -3651,6 +3651,15 @@
     "spikesManager": {
       "__id__": 100
     },
+    "usernameEditBox": {
+      "__id__": 201
+    },
+    "passwordEditBox": {
+      "__id__": 212
+    },
+    "addressEditBox": {
+      "__id__": 223
+    },
     "_id": "e4nxqyUMdKzpl3XhjX5jbq"
   },
   {

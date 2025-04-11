@@ -1,4 +1,4 @@
-import {_decorator, Component, Node} from 'cc';
+import {_decorator, Component, Node, EditBox} from 'cc';
 import {SpikesManager} from "db://assets/Scripts/SpikesManager";
 import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
 
@@ -14,11 +14,17 @@ export class UIManager extends Component {
     chooseGame: Node = null;
     @property({type: SpikesManager})
     spikesManager: SpikesManager = null;
+    @property({type: EditBox})
+    usernameEditBox: EditBox = null;
+    @property({type: EditBox})
+    passwordEditBox: EditBox = null;
+    @property({type: EditBox})
+    addressEditBox: EditBox = null;
 
     handleClickLogin() {
         this.login.active = false;
         this.startButton.active = true;
-        TsrpcManager.instance.login().then();
+        TsrpcManager.instance.login(this.usernameEditBox.string, this.passwordEditBox.string, this.addressEditBox.string).then();
     }
 
     handleClickStart() {
