@@ -46,9 +46,12 @@ export class UIManager extends Component {
     }
 
     readStorage() {
-        this.usernameEditBox.string = localStorage.getItem("username");
-        this.passwordEditBox.string = localStorage.getItem("password");
-        this.addressEditBox.string = localStorage.getItem("address");
+        const username = localStorage.getItem("username");
+        const password = localStorage.getItem("password");
+        const address = localStorage.getItem("address");
+        this.usernameEditBox.string = username ? username : "";
+        this.passwordEditBox.string = password ? password : "";
+        this.addressEditBox.string = address ? address : "";
     }
 
     writeStorage() {
