@@ -23,12 +23,17 @@ export class UIManager extends Component {
     @property({type: Label})
     confirmLabel: Label = null;
 
+    start() {
+        this.readStorage();
+    }
+
     handleClickLogin() {
         this.confirmLabel.string = "Waiting...";
         TsrpcManager.instance.login(this.usernameEditBox.string, this.passwordEditBox.string, this.addressEditBox.string).then(ok => {
             if (ok) {
                 this.login.active = false;
                 this.startButton.active = true;
+                this.writeStorage();
             }
             this.confirmLabel.string = "Confirm";
         });
@@ -38,6 +43,18 @@ export class UIManager extends Component {
         this.startButton.active = false;
         this.chooseGame.active = true;
         this.spikesManager.handleStart(0, 1, 21, 2);
+    }
+
+    readStorage() {
+        this.usernameEditBox.string = localStorage.getItem("username");
+        this.passwordEditBox.string = localStorage.getItem("password");
+        this.addressEditBox.string = localStorage.getItem("address");
+    }
+
+    writeStorage() {
+        localStorage.setItem("username", this.usernameEditBox.string);
+        localStorage.setItem("password", this.passwordEditBox.string);
+        localStorage.setItem("address", this.addressEditBox.string);
     }
 }
 
