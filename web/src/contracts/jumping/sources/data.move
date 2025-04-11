@@ -14,6 +14,7 @@ use sui::vec_map::{Self, VecMap};
 // error code
 const E_Not_Valid_GP_Amount: u64 = 0;
 const E_Not_Enough_Steps: u64 = 1;
+const E_Not_Have_Empty_Game_Place: u64 = 2;
 
 public struct GameData has store {
     list: u64,
@@ -45,8 +46,9 @@ fun init(ctx: &mut TxContext) {
     });
 }
 
-public fun new_game(_: &Publisher, data_pool: &mut DataPool, nft_id: ID, hash_key: String, gp: Coin<GP>) {
+public fun new_game(data_pool: &mut DataPool, nft_id: ID, hash_key: String, mut gp: Coin<GP>, ctx: &mut TxContext) {
     assert!(gp.value() == 30, E_Not_Valid_GP_Amount);
+    let steps = gp.split(10, ctx).into_balance();
     let value = GameData {
         list: 0,
         row: 0,
@@ -61,11 +63,13 @@ public fun new_game(_: &Publisher, data_pool: &mut DataPool, nft_id: ID, hash_ke
         });
     };
     let user_info = &mut data_pool.pool_table[nft_id];
+    assert!(user_info.hash_data.size() < 2, E_Not_Have_Empty_Game_Place);
+    user_info.steps.join(steps);
     user_info.hash_data.insert(hash_key, value);
 }
 
-public fun new_game_with_nft(publisher: &Publisher, data_pool: &mut DataPool, nft: &BlackSquidJumpingNFT, hash_key: String, gp: Coin<GP>) {
-    new_game(publisher, data_pool, object::id(nft), hash_key, gp);
+public fun new_game_with_nft(data_pool: &mut DataPool, nft: &BlackSquidJumpingNFT, hash_key: String, gp: Coin<GP>, ctx: &mut TxContext) {
+    new_game(data_pool, object::id(nft), hash_key, gp, ctx);
 }
 
 fun rand_num(random: &Random, ctx: &mut TxContext): u8 {
@@ -84,12 +88,12 @@ fun distribute_step_rewards(data: &mut GameData, next_pos: u8, receipt: address,
         user_rewards.join(data.cur_step_paid.split(cur_step_reward_amount));
     };
     // split final reward
-    let split_final_reward_amount = data.final_reward.value() / (data.end - data.list);
+    let split_final_reward_amount = data.final_reward.value() / (data.end - data.list + 1);
     if (split_final_reward_amount > 0) {
         user_rewards.join(data.final_reward.split(split_final_reward_amount));
     };
 
-    if (data.list + 1 < data.end) {
+    if (data.list < data.end) {
         // accumulate rewards
         data.final_reward.join(data.cur_step_paid.withdraw_all());
     } else {
@@ -143,7 +147,7 @@ entry fun next_step(
     if (user_pos == safe_pos) {
         distribute_step_rewards(data, user_pos, receipt, ctx);
         // check if can end the game
-        if (data.list + 1 == data.end) {
+        if (data.list == data.end) {
             drop_game_data(data_pool, nft_id, hash_key);
         };
     } else {
