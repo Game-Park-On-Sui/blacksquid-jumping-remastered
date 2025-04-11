@@ -1,4 +1,4 @@
-import {_decorator, Component, Node, EditBox} from 'cc';
+import {_decorator, Component, Node, EditBox, Label} from 'cc';
 import {SpikesManager} from "db://assets/Scripts/SpikesManager";
 import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
 
@@ -20,11 +20,18 @@ export class UIManager extends Component {
     passwordEditBox: EditBox = null;
     @property({type: EditBox})
     addressEditBox: EditBox = null;
+    @property({type: Label})
+    confirmLabel: Label = null;
 
     handleClickLogin() {
-        this.login.active = false;
-        this.startButton.active = true;
-        TsrpcManager.instance.login(this.usernameEditBox.string, this.passwordEditBox.string, this.addressEditBox.string).then();
+        this.confirmLabel.string = "Waiting...";
+        TsrpcManager.instance.login(this.usernameEditBox.string, this.passwordEditBox.string, this.addressEditBox.string).then(ok => {
+            if (ok) {
+                this.login.active = false;
+                this.startButton.active = true;
+            }
+            this.confirmLabel.string = "Confirm";
+        });
     }
 
     handleClickStart() {

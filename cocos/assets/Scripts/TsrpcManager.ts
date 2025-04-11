@@ -22,7 +22,7 @@ export class TsrpcManager {
             password,
             address
         });
-        console.log(res.res.state);
+        return res.res.state === "success";
     }
 }
 
