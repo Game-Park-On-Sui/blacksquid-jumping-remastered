@@ -31,7 +31,8 @@ public struct UserInfo has store {
 
 public struct DataPool has key {
     id: UID,
-    pool_table: Table<ID, UserInfo>
+    pool_table: Table<ID, UserInfo>,
+    rewards: Balance<GP>
 }
 
 public struct StepResult has copy, drop {
@@ -42,19 +43,19 @@ public struct StepResult has copy, drop {
 fun init(ctx: &mut TxContext) {
     transfer::share_object(DataPool {
         id: object::new(ctx),
-        pool_table: table::new<ID, UserInfo>(ctx)
+        pool_table: table::new<ID, UserInfo>(ctx),
+        rewards: balance::zero<GP>()
     });
 }
 
-public fun new_game(data_pool: &mut DataPool, nft_id: ID, hash_key: String, mut gp: Coin<GP>, ctx: &mut TxContext) {
-    assert!(gp.value() == 30, E_Not_Valid_GP_Amount);
-    let steps = gp.split(10, ctx).into_balance();
+public fun new_game(data_pool: &mut DataPool, nft_id: ID, hash_key: String, gp: Coin<GP>) {
+    assert!(gp.value() == 10, E_Not_Valid_GP_Amount);
     let value = GameData {
         list: 0,
         row: 0,
         end: 10,
         cur_step_paid: balance::zero<GP>(),
-        final_reward: gp.into_balance()
+        final_reward: data_pool.rewards.split(20)
     };
     if (!data_pool.pool_table.contains(nft_id)) {
         data_pool.pool_table.add(nft_id, UserInfo {
@@ -64,12 +65,12 @@ public fun new_game(data_pool: &mut DataPool, nft_id: ID, hash_key: String, mut 
     };
     let user_info = &mut data_pool.pool_table[nft_id];
     assert!(user_info.hash_data.size() < 2, E_Not_Have_Empty_Game_Place);
-    user_info.steps.join(steps);
+    user_info.steps.join(gp.into_balance());
     user_info.hash_data.insert(hash_key, value);
 }
 
-public fun new_game_with_nft(data_pool: &mut DataPool, nft: &BlackSquidJumpingNFT, hash_key: String, gp: Coin<GP>, ctx: &mut TxContext) {
-    new_game(data_pool, object::id(nft), hash_key, gp, ctx);
+public fun new_game_with_nft(data_pool: &mut DataPool, nft: &BlackSquidJumpingNFT, hash_key: String, gp: Coin<GP>) {
+    new_game(data_pool, object::id(nft), hash_key, gp);
 }
 
 fun rand_num(random: &Random, ctx: &mut TxContext): u8 {
@@ -157,4 +158,8 @@ entry fun next_step(
         user_pos,
         safe_pos,
     });
+}
+
+public entry fun charity_invest(data_pool: &mut DataPool, gp: Coin<GP>) {
+    data_pool.rewards.join(gp.into_balance());
 }
