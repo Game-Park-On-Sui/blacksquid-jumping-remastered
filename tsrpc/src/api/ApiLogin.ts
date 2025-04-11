@@ -1,11 +1,9 @@
-import { ApiCall } from "tsrpc";
+import {ApiCall} from "tsrpc";
 import CryptoJS from "crypto-js";
 import dotenv from "dotenv";
-import { ReqLogin, ResLogin } from "../shared/protocols/PtlLogin";
-import {SuiClient} from "@mysten/sui/client";
-import {network, networkConfig} from "../config/networkConfig";
+import {ReqLogin, ResLogin} from "../shared/protocols/PtlLogin";
+import {keypair, network, networkConfig, suiClient} from "../config/networkConfig";
 import {Transaction} from "@mysten/sui/transactions";
-import {Ed25519Keypair} from "@mysten/sui/keypairs/ed25519";
 
 dotenv.config();
 
@@ -15,9 +13,7 @@ function hmacSHA256(pwd: string) {
 }
 
 async function checkInMove(username: string, password: string, address: string) {
-    const client = new SuiClient({url: networkConfig[network].url});
     const tx = new Transaction();
-    const keypair = Ed25519Keypair.fromSecretKey(process.env.PRIVATE_KEY!);
     tx.moveCall({
         package: networkConfig[network].variables.PackageID,
         module: "user_info",
@@ -31,7 +27,7 @@ async function checkInMove(username: string, password: string, address: string) 
             tx.pure.string(hmacSHA256(password + "devtest"))
         ]
     });
-    const devResult = await client.devInspectTransactionBlock({
+    const devResult = await suiClient.devInspectTransactionBlock({
         transactionBlock: tx,
         sender: keypair.toSuiAddress()
     });

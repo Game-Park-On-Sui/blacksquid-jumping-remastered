@@ -1,4 +1,6 @@
-import {getFullnodeUrl} from "@mysten/sui/client";
+import {getFullnodeUrl, SuiClient} from "@mysten/sui/client";
+import {Ed25519Keypair} from "@mysten/sui/keypairs/ed25519";
+import dotenv from "dotenv";
 
 type Network = "mainnet" | "testnet";
 
@@ -28,3 +30,8 @@ export const networkConfig = {
         }
     }
 }
+
+dotenv.config();
+
+export const suiClient = new SuiClient({url: networkConfig[network].url});
+export const keypair = Ed25519Keypair.fromSecretKey(process.env.PRIVATE_KEY!);
