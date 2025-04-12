@@ -141,3 +141,25 @@ export async function getStepsAndGames(owner: string | undefined, nftID: string 
     const userInfo = await getUserInfo(userInfoID);
     return [userInfo.fields.value.fields.steps, userInfo.fields.value.fields.hash_data.fields.contents.length];
 }
+
+export const buyStepsTx = createBetterTxFactory<{
+    nftID: string,
+    amount: number,
+    sender: string
+}>((tx, networkVariables, params) => {
+    tx.setSender(params.sender);
+    tx.moveCall({
+        package: networkVariables.JumpingPackageID,
+        module: "data",
+        function: "buy_steps",
+        arguments: [
+            tx.object(networkVariables.DataPool),
+            tx.pure.id(params.nftID),
+            coinWithBalance({
+                balance: params.amount,
+                type: `${networkVariables.PackageID}::gp::GP`,
+            })
+        ]
+    });
+    return tx;
+});

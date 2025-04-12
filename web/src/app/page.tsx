@@ -4,7 +4,7 @@ import {useBetterSignAndExecuteTransaction, useMediaSize} from "@/hooks";
 import "@/app/page.css"
 import {RefreshCw} from "lucide-react";
 import {CustomSuiButton, Waiting} from "@/components";
-import {newGameTx} from "@/libs/contracts";
+import {buyStepsTx, newGameTx} from "@/libs/contracts";
 import {ChangeEvent, useContext, useState} from "react";
 import {UserContext} from "@/contexts";
 
@@ -29,7 +29,7 @@ export default function Home() {
     }
 
     const canBuySteps = () => {
-        return userInfo.account && inputSteps && userInfo.gp && Number(inputSteps) <= Number(userInfo.gp);
+        return userInfo.account && userInfo.nftID && inputSteps && userInfo.gp && Number(inputSteps) <= Number(userInfo.gp);
     }
 
     const {handleSignAndExecuteTransaction: handleNewGame} = useBetterSignAndExecuteTransaction({
@@ -42,6 +42,28 @@ export default function Home() {
         await handleNewGame({
             nftID: userInfo.nftID,
             sender: userInfo.account
+        }).beforeExecute(() => {
+            setIsWaiting(true);
+        }).onError(err => {
+            console.error(err);
+            setIsWaiting(false);
+        }).onSuccess(() => {
+            userInfo.refreshInfo();
+            setIsWaiting(false);
+        }).onExecute();
+    }
+
+    const {handleSignAndExecuteTransaction: handleBuySteps} = useBetterSignAndExecuteTransaction({
+        tx: buyStepsTx,
+        waitForTx: true,
+    });
+    const handleClickBuySteps = async () => {
+        if (!canBuySteps() || isWaiting)
+            return;
+        await handleBuySteps({
+            nftID: userInfo.nftID!,
+            amount: Number(inputSteps),
+            sender: userInfo.account!
         }).beforeExecute(() => {
             setIsWaiting(true);
         }).onError(err => {
@@ -92,7 +114,7 @@ export default function Home() {
                     <span className={userInfo.canAddNewGame ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickNewGame}>NewGame</span>
                     <div className="flex flex-col gap-1 items-center">
                         <input className="w-full font-bold focus:outline-none text-center px-1" placeholder="input steps" value={inputSteps} onChange={changeInputSteps}/>
-                        <span className={canBuySteps() ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"}>BuySteps</span>
+                        <span className={canBuySteps() ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickBuySteps}>BuySteps</span>
                     </div>
                     <div className="flex flex-col gap-2 items-center text-xs text-[#afb3b5]">
                         <span>GP: {userInfo.gp}</span>
