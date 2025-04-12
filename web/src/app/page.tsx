@@ -22,6 +22,8 @@ export default function Home() {
         await handleNewGame({
             nftID: userInfo.nftID,
             sender: userInfo.account
+        }).onSuccess(() => {
+            userInfo.refreshInfo();
         }).onExecute();
     }
 
@@ -55,6 +57,7 @@ export default function Home() {
                             <RefreshCw
                                 className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]"
                                 size={12}
+                                onClick={userInfo.refreshInfo}
                             />
                         </div>
                         <hr className="w-full border-[#041f4b]" />

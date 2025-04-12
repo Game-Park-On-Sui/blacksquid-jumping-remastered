@@ -12,6 +12,7 @@ type UserInfoType = {
     gp: string | null | undefined,
     steps: string | null | undefined,
     canAddNewGame: boolean,
+    refreshInfo: () => void
 }
 
 export const UserContext = createContext<UserInfoType>({
@@ -22,6 +23,7 @@ export const UserContext = createContext<UserInfoType>({
     gp: undefined,
     steps: undefined,
     canAddNewGame: false,
+    refreshInfo: () => {},
 });
 
 export default function UserContextProvider({children}: {children: ReactNode}) {
@@ -41,6 +43,13 @@ export default function UserContextProvider({children}: {children: ReactNode}) {
         });
         getGP(account?.address).then(gp => setGp(gp));
     }, [account]);
+    const refreshInfo = () => {
+        getGP(account?.address).then(gp => setGp(gp));
+        getStepsAndGames(account?.address, nftID).then(data => {
+            setSteps(data[0]);
+            setCanAddNewGame(data[1] < 2);
+        });
+    }
 
     return (
         <UserContext.Provider value={{
@@ -51,6 +60,7 @@ export default function UserContextProvider({children}: {children: ReactNode}) {
             gp,
             steps,
             canAddNewGame,
+            refreshInfo,
         }}>
             {children}
         </UserContext.Provider>
