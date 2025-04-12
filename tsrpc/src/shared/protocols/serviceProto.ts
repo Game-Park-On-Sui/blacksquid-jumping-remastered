@@ -1,8 +1,13 @@
 import { ServiceProto } from 'tsrpc-proto';
+import { ReqGetNFT, ResGetNFT } from './PtlGetNFT';
 import { ReqLogin, ResLogin } from './PtlLogin';
 
 export interface ServiceType {
     api: {
+        "GetNFT": {
+            req: ReqGetNFT,
+            res: ResGetNFT
+        },
         "Login": {
             req: ReqLogin,
             res: ResLogin
@@ -14,8 +19,13 @@ export interface ServiceType {
 }
 
 export const serviceProto: ServiceProto<ServiceType> = {
-    "version": 3,
+    "version": 4,
     "services": [
+        {
+            "id": 1,
+            "name": "GetNFT",
+            "type": "api"
+        },
         {
             "id": 0,
             "name": "Login",
@@ -23,6 +33,30 @@ export const serviceProto: ServiceProto<ServiceType> = {
         }
     ],
     "types": {
+        "PtlGetNFT/ReqGetNFT": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "address",
+                    "type": {
+                        "type": "String"
+                    }
+                }
+            ]
+        },
+        "PtlGetNFT/ResGetNFT": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "nftID",
+                    "type": {
+                        "type": "String"
+                    }
+                }
+            ]
+        },
         "PtlLogin/ReqLogin": {
             "type": "Interface",
             "properties": [

@@ -58,6 +58,10 @@ export class UIManager extends Component {
         localStorage.setItem("username", this.usernameEditBox.string);
         localStorage.setItem("password", this.passwordEditBox.string);
         localStorage.setItem("address", this.addressEditBox.string);
+        TsrpcManager.instance.getNFTID(localStorage.getItem("address")).then(nftID => {
+            localStorage.setItem("nftID", nftID);
+            console.log(nftID);
+        });
     }
 }
 

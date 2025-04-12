@@ -24,5 +24,11 @@ export class TsrpcManager {
         });
         return res.res.state === "success";
     }
+
+    async getNFTID(address: string) {
+        return (await this._apiClient.callApi("GetNFT", {
+            address
+        })).res.nftID;
+    }
 }
 
