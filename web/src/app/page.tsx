@@ -17,7 +17,7 @@ export default function Home() {
         waitForTx: true,
     });
     const handleClickNewGame = async () => {
-        if (!userInfo.account)
+        if (!userInfo.account || !userInfo.canAddNewGame)
             return;
         await handleNewGame({
             nftID: userInfo.nftID,
@@ -60,11 +60,11 @@ export default function Home() {
                         <hr className="w-full border-[#041f4b]" />
                     </div>
                     <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]">Market</span>
-                    <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" onClick={handleClickNewGame}>NewGame</span>
+                    <span className={userInfo.canAddNewGame ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickNewGame}>NewGame</span>
                     <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]">BuySteps</span>
                     <div className="flex flex-col gap-2 items-center text-xs text-[#afb3b5]">
-                        <span>GP: 1000000000</span>
-                        <span>Steps: 1000000000</span>
+                        <span>GP: {userInfo.gp}</span>
+                        <span>Steps: {userInfo.steps}</span>
                     </div>
                 </div>
             </div>

@@ -68,3 +68,76 @@ export const newGameTx = createBetterTxFactory<{
     }
     return tx;
 });
+
+export async function getGP(owner: string | undefined) {
+    if (!owner)
+        return "0";
+    return (await suiClient.getBalance({
+        owner,
+        coinType: `${networkConfig[network].variables.PackageID}::gp::GP`
+    })).totalBalance;
+}
+
+type DataPoolType = {
+    fields: {
+        pool_table: {
+            fields: {
+                id: {
+                    id: string
+                }
+            }
+        }
+    }
+}
+
+type UserInfoType = {
+    fields: {
+        value: {
+            fields: {
+                hash_data: {
+                    fields: {
+                        contents: {
+                            length: number
+                        }
+                    }
+                },
+                steps: string
+            }
+        }
+    }
+}
+
+async function getUserInfoID(id: string, cursor: string | null | undefined, nftID: string): Promise<string | undefined> {
+    const data = await suiClient.getDynamicFields({
+        parentId: id,
+        cursor,
+    });
+    const found = data.data.find(data => (data.name.value as string) === nftID);
+    return found ? found.objectId : (data.hasNextPage ? await getUserInfoID(id, data.nextCursor, nftID) : undefined);
+}
+
+async function getUserInfo(id: string) {
+    const data = await suiClient.getObject({
+        id,
+        options: {
+            showContent: true
+        }
+    });
+    return data.data?.content as unknown as UserInfoType;
+}
+
+export async function getStepsAndGames(owner: string | undefined, nftID: string | null | undefined): Promise<[string, number]> {
+    if (!owner || !nftID)
+        return ["0", 3];
+    const dataPool = await suiClient.getObject({
+        id: networkConfig[network].variables.DataPool,
+        options: {
+            showContent: true
+        }
+    });
+    const userInfoID = await getUserInfoID((dataPool.data?.content as unknown as DataPoolType).fields.pool_table.fields.id.id, null, nftID);
+    if (!userInfoID)
+        return ["0", 3];
+    const userInfo = await getUserInfo(userInfoID);
+    return [userInfo.fields.value.fields.steps, userInfo.fields.value.fields.hash_data.fields.contents.length];
+}

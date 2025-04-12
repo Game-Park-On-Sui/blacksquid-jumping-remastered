@@ -2,28 +2,44 @@
 
 import {createContext, ReactNode, useEffect, useState} from "react";
 import {useCurrentAccount, useResolveSuiNSName} from "@mysten/dapp-kit";
-import {getNFTID} from "@/libs/contracts";
+import {getGP, getNFTID, getStepsAndGames} from "@/libs/contracts";
 
 type UserInfoType = {
     account: string | null | undefined,
     suiName: string | null | undefined,
     accountLabel: string | null | undefined,
     nftID: string | null | undefined,
+    gp: string | null | undefined,
+    steps: string | null | undefined,
+    canAddNewGame: boolean,
 }
 
 export const UserContext = createContext<UserInfoType>({
     account: undefined,
     suiName: undefined,
     accountLabel: undefined,
-    nftID: undefined
+    nftID: undefined,
+    gp: undefined,
+    steps: undefined,
+    canAddNewGame: false,
 });
 
 export default function UserContextProvider({children}: {children: ReactNode}) {
     const account = useCurrentAccount();
     const {data: suiName} = useResolveSuiNSName(account?.address);
     const [nftID, setNftID] = useState<string | null | undefined>(undefined);
+    const [gp, setGp] = useState<string>("");
+    const [steps, setSteps] = useState<string>("");
+    const [canAddNewGame, setCanAddNewGame] = useState<boolean>(false);
     useEffect(() => {
-        getNFTID(account?.address, null).then(nftID => setNftID(nftID));
+        getNFTID(account?.address, null).then(nftID => {
+            setNftID(nftID);
+            getStepsAndGames(account?.address, nftID).then(data => {
+                setSteps(data[0]);
+                setCanAddNewGame(data[1] < 2);
+            });
+        });
+        getGP(account?.address).then(gp => setGp(gp));
     }, [account]);
 
     return (
@@ -31,7 +47,10 @@ export default function UserContextProvider({children}: {children: ReactNode}) {
             account: account?.address,
             suiName,
             accountLabel: account?.label,
-            nftID
+            nftID,
+            gp,
+            steps,
+            canAddNewGame,
         }}>
             {children}
         </UserContext.Provider>
