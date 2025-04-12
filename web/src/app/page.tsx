@@ -5,13 +5,32 @@ import "@/app/page.css"
 import {RefreshCw} from "lucide-react";
 import {CustomSuiButton, Waiting} from "@/components";
 import {newGameTx} from "@/libs/contracts";
-import {useContext, useState} from "react";
+import {ChangeEvent, useContext, useState} from "react";
 import {UserContext} from "@/contexts";
 
 export default function Home() {
     const [width, height] = useMediaSize();
     const userInfo = useContext(UserContext);
     const [isWaiting, setIsWaiting] = useState<boolean>(false);
+    const [inputSteps, setInputSteps] = useState<string>("");
+
+    const changeInputSteps = (e: ChangeEvent<HTMLInputElement>) => {
+        const amount = e.target.value;
+        for (let i = 0; i < amount.length; i++) {
+            const num = amount[i];
+            if (num < '0' || num > '9')
+                return;
+        }
+        let i = 0;
+        while (i < amount.length && amount[i] === '0')
+            i = i + 1;
+        const finalAmount = i < amount.length ? amount.slice(i) : '';
+        setInputSteps(finalAmount);
+    }
+
+    const canBuySteps = () => {
+        return userInfo.account && inputSteps && userInfo.gp && Number(inputSteps) <= Number(userInfo.gp);
+    }
 
     const {handleSignAndExecuteTransaction: handleNewGame} = useBetterSignAndExecuteTransaction({
         tx: newGameTx,
@@ -71,7 +90,10 @@ export default function Home() {
                     </div>
                     <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]">Market</span>
                     <span className={userInfo.canAddNewGame ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickNewGame}>NewGame</span>
-                    <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]">BuySteps</span>
+                    <div className="flex flex-col gap-1 items-center">
+                        <input className="w-full font-bold focus:outline-none text-center px-1" placeholder="input steps" value={inputSteps} onChange={changeInputSteps}/>
+                        <span className={canBuySteps() ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"}>BuySteps</span>
+                    </div>
                     <div className="flex flex-col gap-2 items-center text-xs text-[#afb3b5]">
                         <span>GP: {userInfo.gp}</span>
                         <span>Steps: {userInfo.steps}</span>
