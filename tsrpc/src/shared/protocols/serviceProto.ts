@@ -1,9 +1,14 @@
 import { ServiceProto } from 'tsrpc-proto';
+import { ReqGetGameInfo, ResGetGameInfo } from './PtlGetGameInfo';
 import { ReqGetNFT, ResGetNFT } from './PtlGetNFT';
 import { ReqLogin, ResLogin } from './PtlLogin';
 
 export interface ServiceType {
     api: {
+        "GetGameInfo": {
+            req: ReqGetGameInfo,
+            res: ResGetGameInfo
+        },
         "GetNFT": {
             req: ReqGetNFT,
             res: ResGetNFT
@@ -23,6 +28,11 @@ export const serviceProto: ServiceProto<ServiceType> = {
     "services": [
         {
             "id": 1,
+            "name": "GetGameInfo",
+            "type": "api"
+        },
+        {
+            "id": 2,
             "name": "GetNFT",
             "type": "api"
         },
@@ -33,6 +43,185 @@ export const serviceProto: ServiceProto<ServiceType> = {
         }
     ],
     "types": {
+        "PtlGetGameInfo/ReqGetGameInfo": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "address",
+                    "type": {
+                        "type": "String"
+                    }
+                },
+                {
+                    "id": 1,
+                    "name": "nftID",
+                    "type": {
+                        "type": "String"
+                    }
+                }
+            ]
+        },
+        "PtlGetGameInfo/ResGetGameInfo": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "gameInfo",
+                    "type": {
+                        "type": "Array",
+                        "elementType": {
+                            "type": "Reference",
+                            "target": "PtlGetGameInfo/GameInfoType"
+                        }
+                    }
+                }
+            ]
+        },
+        "PtlGetGameInfo/GameInfoType": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "fields",
+                    "type": {
+                        "type": "Interface",
+                        "properties": [
+                            {
+                                "id": 0,
+                                "name": "key",
+                                "type": {
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "id": 1,
+                                "name": "value",
+                                "type": {
+                                    "type": "Interface",
+                                    "properties": [
+                                        {
+                                            "id": 0,
+                                            "name": "fields",
+                                            "type": {
+                                                "type": "Interface",
+                                                "properties": [
+                                                    {
+                                                        "id": 0,
+                                                        "name": "list",
+                                                        "type": {
+                                                            "type": "Union",
+                                                            "members": [
+                                                                {
+                                                                    "id": 0,
+                                                                    "type": {
+                                                                        "type": "String"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "id": 1,
+                                                                    "type": {
+                                                                        "type": "Number"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "id": 1,
+                                                        "name": "row",
+                                                        "type": {
+                                                            "type": "Union",
+                                                            "members": [
+                                                                {
+                                                                    "id": 0,
+                                                                    "type": {
+                                                                        "type": "String"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "id": 1,
+                                                                    "type": {
+                                                                        "type": "Number"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "id": 2,
+                                                        "name": "end",
+                                                        "type": {
+                                                            "type": "Union",
+                                                            "members": [
+                                                                {
+                                                                    "id": 0,
+                                                                    "type": {
+                                                                        "type": "String"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "id": 1,
+                                                                    "type": {
+                                                                        "type": "Number"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "id": 3,
+                                                        "name": "cur_step_paid",
+                                                        "type": {
+                                                            "type": "Union",
+                                                            "members": [
+                                                                {
+                                                                    "id": 0,
+                                                                    "type": {
+                                                                        "type": "String"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "id": 1,
+                                                                    "type": {
+                                                                        "type": "Number"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "id": 4,
+                                                        "name": "final_reward",
+                                                        "type": {
+                                                            "type": "Union",
+                                                            "members": [
+                                                                {
+                                                                    "id": 0,
+                                                                    "type": {
+                                                                        "type": "String"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "id": 1,
+                                                                    "type": {
+                                                                        "type": "Number"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
         "PtlGetNFT/ReqGetNFT": {
             "type": "Interface",
             "properties": [

@@ -30,5 +30,12 @@ export class TsrpcManager {
             address
         })).res.nftID;
     }
+
+    async getGameInfo(address: string, nftID: string) {
+        return (await this._apiClient.callApi("GetGameInfo", {
+            address,
+            nftID
+        })).res.gameInfo;
+    }
 }
 
