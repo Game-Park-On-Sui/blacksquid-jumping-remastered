@@ -3,27 +3,34 @@
 import {useBetterSignAndExecuteTransaction, useMediaSize} from "@/hooks";
 import "@/app/page.css"
 import {RefreshCw} from "lucide-react";
-import {CustomSuiButton} from "@/components";
+import {CustomSuiButton, Waiting} from "@/components";
 import {newGameTx} from "@/libs/contracts";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {UserContext} from "@/contexts";
 
 export default function Home() {
     const [width, height] = useMediaSize();
     const userInfo = useContext(UserContext);
+    const [isWaiting, setIsWaiting] = useState<boolean>(false);
 
     const {handleSignAndExecuteTransaction: handleNewGame} = useBetterSignAndExecuteTransaction({
         tx: newGameTx,
         waitForTx: true,
     });
     const handleClickNewGame = async () => {
-        if (!userInfo.account || !userInfo.canAddNewGame)
+        if (!userInfo.account || !userInfo.canAddNewGame || isWaiting)
             return;
         await handleNewGame({
             nftID: userInfo.nftID,
             sender: userInfo.account
+        }).beforeExecute(() => {
+            setIsWaiting(true);
+        }).onError(err => {
+            console.error(err);
+            setIsWaiting(false);
         }).onSuccess(() => {
             userInfo.refreshInfo();
+            setIsWaiting(false);
         }).onExecute();
     }
 
@@ -71,6 +78,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+            {isWaiting && <Waiting />}
         </div>
     );
 }
