@@ -2,6 +2,7 @@ import { ServiceProto } from 'tsrpc-proto';
 import { ReqGetGameInfo, ResGetGameInfo } from './PtlGetGameInfo';
 import { ReqGetNFT, ResGetNFT } from './PtlGetNFT';
 import { ReqLogin, ResLogin } from './PtlLogin';
+import { ReqNextStep, ResNextStep } from './PtlNextStep';
 
 export interface ServiceType {
     api: {
@@ -16,6 +17,10 @@ export interface ServiceType {
         "Login": {
             req: ReqLogin,
             res: ResLogin
+        },
+        "NextStep": {
+            req: ReqNextStep,
+            res: ResNextStep
         }
     },
     msg: {
@@ -24,7 +29,7 @@ export interface ServiceType {
 }
 
 export const serviceProto: ServiceProto<ServiceType> = {
-    "version": 4,
+    "version": 6,
     "services": [
         {
             "id": 1,
@@ -39,6 +44,11 @@ export const serviceProto: ServiceProto<ServiceType> = {
         {
             "id": 0,
             "name": "Login",
+            "type": "api"
+        },
+        {
+            "id": 3,
+            "name": "NextStep",
             "type": "api"
         }
     ],
@@ -280,6 +290,51 @@ export const serviceProto: ServiceProto<ServiceType> = {
                     "name": "state",
                     "type": {
                         "type": "String"
+                    }
+                }
+            ]
+        },
+        "PtlNextStep/ReqNextStep": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "nftID",
+                    "type": {
+                        "type": "String"
+                    }
+                },
+                {
+                    "id": 1,
+                    "name": "hashKey",
+                    "type": {
+                        "type": "String"
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "userPos",
+                    "type": {
+                        "type": "String"
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "receipt",
+                    "type": {
+                        "type": "String"
+                    }
+                }
+            ]
+        },
+        "PtlNextStep/ResNextStep": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "safePos",
+                    "type": {
+                        "type": "Number"
                     }
                 }
             ]

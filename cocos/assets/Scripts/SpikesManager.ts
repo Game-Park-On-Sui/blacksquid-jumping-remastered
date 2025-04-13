@@ -1,6 +1,8 @@
 import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch, Label} from 'cc';
 import {Player} from "db://assets/Scripts/Player";
 import {ReStartButton} from "db://assets/Scripts/ReStartButton";
+import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
+import {TipsTimeout} from "db://assets/Scripts/TipsTimeout";
 
 const {ccclass, property} = _decorator;
 
@@ -30,6 +32,8 @@ export class SpikesManager extends Component {
     totalAwardLabel: Label = null;
     @property({type: ReStartButton})
     restartButton: ReStartButton = null;
+    @property({type: Node})
+    tips: Node = null;
 
     private spikes: Node[] = [];
     private isVisibleSpikes: boolean[] = [];
@@ -37,7 +41,7 @@ export class SpikesManager extends Component {
     private speed: number = 1;
     private spikesUpSpeed: number[] = [];
     private timer: number = 0;
-    private killOne: number = 0;
+    private killOne: number = -1;
     private oldRow: number = -1;
     private curRow: number = -1;
     private curList: number = 0;
@@ -62,6 +66,17 @@ export class SpikesManager extends Component {
     }
 
     update(deltaTime: number) {
+        if (this.tips.active && this.killOne !== -1) {
+            if (this.killOne > -1) {
+                this.tips.active = false;
+                this.showSpikes();
+                this.checkAlive();
+            } else {
+                this.tips.getComponent(TipsTimeout).delayToHide("Error to Jump");
+                this.checkAlive(false);
+            }
+            return;
+        }
         if (this.timer <= 0)
             return;
         this.timer -= deltaTime;
@@ -77,9 +92,19 @@ export class SpikesManager extends Component {
                 }
             this.lastSpikePosX = curLastSpikePosX;
             this.endPlatform.setPosition(Math.round(this.endPlatform.getPosition().x), 0, 0);
+            if (this.killOne < 0 && this.direction == -1) {
+                this.tips.active = true;
+                return;
+            }
             if (this.killOne !== -1) {
-                this.showSpikes();
-                this.checkAlive();
+                if (this.killOne > -1) {
+                    this.showSpikes();
+                    this.checkAlive();
+                } else {
+                    this.tips.active = true;
+                    this.tips.getComponent(TipsTimeout).delayToHide("Error to Jump");
+                    this.checkAlive(false);
+                }
             } else {
                 this.hiddenSpikes();
             }
@@ -113,13 +138,14 @@ export class SpikesManager extends Component {
         this.ChangeMoveDirection(-1);
         this.speed = 1 / this.player.getJumpDuration();
         this.timer = this.player.getJumpDuration();
-        this.killOne = this.randomKill();
         this.curRow = index;
+        this.randomKill();
     }
 
     randomKill() {
-        return 1;
-        // return Math.floor(Math.random() * 2);
+        const address = localStorage.getItem("address");
+        const nftID = localStorage.getItem("nftID");
+        TsrpcManager.instance.handleNextStep(nftID, this.gameHashKey, this.curRow, address).then(safePos => this.killOne = safePos == 0 ? 1 : (safePos == 1 ? 0 : -2));
     }
 
     showSpikes() {
@@ -135,8 +161,8 @@ export class SpikesManager extends Component {
         this.innerHiddenSpikes(this.spikes.find(spike => spike.getPosition().x === 0));
     }
 
-    checkAlive() {
-        if (this.curRow != this.killOne) {
+    checkAlive(asAlive: boolean = true) {
+        if (asAlive && this.curRow != this.killOne) {
             this.oldRow = this.curRow;
             this.curList++;
             this.curPosLabel.string = this.curList.toString();

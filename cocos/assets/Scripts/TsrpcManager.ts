@@ -37,5 +37,17 @@ export class TsrpcManager {
             nftID
         })).res.gameInfo;
     }
+
+    async handleNextStep(nftID: string, hashKey: string, userPos: number, receipt: string) {
+        const res = (await this._apiClient.callApi("NextStep", {
+            nftID,
+            hashKey,
+            userPos: userPos.toString(),
+            receipt
+        }));
+        if (!res.isSucc)
+            return -2;
+        return res.res.safePos;
+    }
 }
 
