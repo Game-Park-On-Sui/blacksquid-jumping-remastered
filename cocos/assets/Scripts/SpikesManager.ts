@@ -42,6 +42,7 @@ export class SpikesManager extends Component {
     private curRow: number = -1;
     private curList: number = 0;
     private lastSpikePosX: number = 0;
+    private gameHashKey: string = "";
 
     start() {
         for (let i = 0; i < this.spikesCount; i++) {
@@ -188,7 +189,7 @@ export class SpikesManager extends Component {
         this.restartButton.showReStart();
     }
 
-    handleStart(curPos: number, curPosAward: number, totalPos: number, totalAward: number) {
+    handleStart(curPos: number, curPosAward: number, totalPos: number, totalAward: number, hashKey: string) {
         const lastPos = totalPos - curPos;
         for (let i = 0; i < 20; i++) {
             const spike = this.spikes[i];
@@ -209,6 +210,7 @@ export class SpikesManager extends Component {
         this.lastSpikePosX = lastPos - 1;
         this.fixEndPlatformPos(this.lastSpikePosX + 1);
         this.player.node.setPosition(-1, 0.1, 0);
+        this.gameHashKey = hashKey;
     }
 }
 
