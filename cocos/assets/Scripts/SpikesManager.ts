@@ -216,7 +216,7 @@ export class SpikesManager extends Component {
             this.tips.getComponent(TipsTimeout).delayToHide("Award: " + award, Color.GREEN, 1);
             return;
         }
-        this.restartButton.showReStart();
+        this.restartButton.showReStart(award);
     }
 
     handleStart(curPos: number, curPosAward: number, totalPos: number, totalAward: number, hashKey: string) {
