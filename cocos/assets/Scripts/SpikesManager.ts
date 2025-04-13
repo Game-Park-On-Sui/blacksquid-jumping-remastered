@@ -162,10 +162,11 @@ export class SpikesManager extends Component {
     }
 
     checkAlive(asAlive: boolean = true) {
+        this.updateGameInfo();
         if (asAlive && this.curRow != this.killOne) {
             this.oldRow = this.curRow;
             this.curList++;
-            this.curPosLabel.string = this.curList.toString();
+            this.killOne = -1;
             for (let i = 0; i < 20; i++)
                 if (this.isVisibleSpikes[i])
                     this.isVisibleSpikes[i] = Math.round(this.spikes[i].getPosition().x) !== -6;
@@ -178,7 +179,6 @@ export class SpikesManager extends Component {
         this.killOne = -1;
         this.player.die(this.oldRow);
         this.spikesCount++;
-        this.totalPosLabel.string = this.spikesCount.toString();
     }
 
     moveSpikesToEnd() {
@@ -237,6 +237,20 @@ export class SpikesManager extends Component {
         this.fixEndPlatformPos(this.lastSpikePosX + 1);
         this.player.node.setPosition(-1, 0.1, 0);
         this.gameHashKey = hashKey;
+    }
+
+    updateGameInfo() {
+        const address = localStorage.getItem("address");
+        const nftID = localStorage.getItem("nftID");
+        TsrpcManager.instance.getGameInfo(address, nftID).then(ret => {
+            const info = ret.find(info => info.fields.key === this.gameHashKey);
+            if (info) {
+                this.curPosLabel.string = info.fields.value.fields.list.toString();
+                this.curPosAwardLabel.string = info.fields.value.fields.cur_step_paid.toString();
+                this.totalPosLabel.string = info.fields.value.fields.end.toString();
+                this.totalAwardLabel.string = info.fields.value.fields.final_reward.toString();
+            }
+        });
     }
 }
 
