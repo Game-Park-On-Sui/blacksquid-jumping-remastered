@@ -44,6 +44,7 @@ export class UIManager extends Component {
         this.startButton.active = false;
         this.chooseGame.active = true;
         this.spikesManager.handleStart(0, 1, 21, 2, "");
+        this.refreshGameInfo();
     }
 
     readStorage() {
@@ -64,6 +65,12 @@ export class UIManager extends Component {
             localStorage.setItem("nftID", nftID);
             TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
         });
+    }
+
+    refreshGameInfo() {
+        const address = localStorage.getItem("address");
+        const nftID = localStorage.getItem("nftID");
+        TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
     }
 }
 

@@ -10724,11 +10724,11 @@
   {
     "__type__": "cc.ClickEvent",
     "target": {
-      "__id__": 239
+      "__id__": 184
     },
     "component": "",
-    "_componentId": "d2f5fx+YT1H8qiqwhwwgXq5",
-    "handler": "handleStartGame",
+    "_componentId": "4d772JS5TJBe6cNvOAKpXVJ",
+    "handler": "refreshGameInfo",
     "customEventData": ""
   },
   {
