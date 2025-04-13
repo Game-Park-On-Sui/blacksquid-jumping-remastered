@@ -1,4 +1,4 @@
-import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch, Label} from 'cc';
+import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch, Label, Color} from 'cc';
 import {Player} from "db://assets/Scripts/Player";
 import {ReStartButton} from "db://assets/Scripts/ReStartButton";
 import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
@@ -210,8 +210,12 @@ export class SpikesManager extends Component {
     }
 
     checkWin() {
-        if (this.curList !== this.spikesCount)
+        const award = this.calcAward();
+        if (this.curList !== this.spikesCount) {
+            this.tips.active = true;
+            this.tips.getComponent(TipsTimeout).delayToHide("Award: " + award, Color.GREEN, 1);
             return;
+        }
         this.restartButton.showReStart();
     }
 
@@ -251,6 +255,13 @@ export class SpikesManager extends Component {
                 this.totalAwardLabel.string = info.fields.value.fields.final_reward.toString();
             }
         });
+    }
+
+    calcAward() {
+        const curPosAward = Number(this.curPosAwardLabel.string) + 1;
+        const totalAward = Number(this.totalAwardLabel.string);
+        const dx = Number(this.totalPosLabel.string) - Number(this.curPosLabel.string);
+        return this.curList !== this.spikesCount ? Math.floor(curPosAward / 2) + Math.floor(totalAward / dx) : curPosAward + totalAward;
     }
 }
 

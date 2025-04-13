@@ -7,9 +7,9 @@ export class TipsTimeout extends Component {
     @property({type: Label})
     label: Label = null;
 
-    delayToHide(msg: string, delay: number = 2) {
+    delayToHide(msg: string, color: Color = Color.RED, delay: number = 2) {
         this.label.string = msg;
-        this.label.color = Color.RED;
+        this.label.color = color;
         this.scheduleOnce(() => {
             this.label.string = "Waiting...";
             Color.fromHEX(this.label.color, "196AE3");
