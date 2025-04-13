@@ -1,7 +1,6 @@
 import {_decorator, Component, Node, EditBox, Label} from 'cc';
 import {SpikesManager} from "db://assets/Scripts/SpikesManager";
 import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
-import {GameInfoType} from "db://assets/Scripts/tsrpc/protocols/PtlGetGameInfo";
 import {ChooseGame} from "db://assets/Scripts/ChooseGame";
 
 const {ccclass, property} = _decorator;
@@ -24,8 +23,6 @@ export class UIManager extends Component {
     addressEditBox: EditBox = null;
     @property({type: Label})
     confirmLabel: Label = null;
-
-    private gameInfo: GameInfoType[] = [];
 
     start() {
         this.readStorage();
@@ -65,10 +62,7 @@ export class UIManager extends Component {
         localStorage.setItem("address", address);
         TsrpcManager.instance.getNFTID(address).then(nftID => {
             localStorage.setItem("nftID", nftID);
-            TsrpcManager.instance.getGameInfo(address, nftID).then(info => {
-                this.gameInfo = info;
-                this.chooseGame.getComponent(ChooseGame).updateGameInfo(info);
-            });
+            TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
         });
     }
 }
