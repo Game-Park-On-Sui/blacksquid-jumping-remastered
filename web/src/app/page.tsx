@@ -5,7 +5,7 @@ import "@/app/page.css"
 import {RefreshCw} from "lucide-react";
 import {CustomSuiButton, Waiting} from "@/components";
 import {buyStepsTx, newGameTx} from "@/libs/contracts";
-import {ChangeEvent, useContext, useState} from "react";
+import {ChangeEvent, useContext, useEffect, useState} from "react";
 import {UserContext} from "@/contexts";
 
 export default function Home() {
@@ -13,6 +13,7 @@ export default function Home() {
     const userInfo = useContext(UserContext);
     const [isWaiting, setIsWaiting] = useState<boolean>(false);
     const [inputSteps, setInputSteps] = useState<string>("");
+    const [timerID, setTimerID] = useState<NodeJS.Timeout>();
 
     const changeInputSteps = (e: ChangeEvent<HTMLInputElement>) => {
         const amount = e.target.value;
@@ -74,6 +75,16 @@ export default function Home() {
             setIsWaiting(false);
         }).onExecute();
     }
+
+    useEffect(() => {
+        if (timerID)
+            clearInterval(timerID);
+        const id = setInterval(userInfo.refreshInfo, 10000);
+        setTimerID(id);
+        return () => {
+            clearInterval(timerID);
+        }
+    }, [userInfo.account, userInfo.nftID]);
 
     return (
         <div style={{
