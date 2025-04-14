@@ -70,6 +70,15 @@ export class UIManager extends Component {
     refreshGameInfo() {
         const address = localStorage.getItem("address");
         const nftID = localStorage.getItem("nftID");
+        if (!nftID) {
+            TsrpcManager.instance.getNFTID(address).then(nftID => {
+                if (!nftID)
+                    return;
+                localStorage.setItem("nftID", nftID);
+                TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
+            });
+            return;
+        }
         TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
     }
 }
