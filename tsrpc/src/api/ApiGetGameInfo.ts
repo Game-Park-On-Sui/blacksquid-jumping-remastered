@@ -56,7 +56,7 @@ export default async function (call: ApiCall<ReqGetGameInfo, ResGetGameInfo>) {
         return;
     }
     const dataPool = await suiClient.getObject({
-        id: networkConfig[network].variables.DataPool,
+        id: networkConfig[network].variables.Jumping.DataPool,
         options: {
             showContent: true
         }

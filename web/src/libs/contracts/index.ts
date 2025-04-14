@@ -13,7 +13,7 @@ export async function getNFTID(owner: string | undefined, cursor: string | null 
             showType: true
         }
     });
-    const found = data.data.find(data => data.data?.type === `${networkConfig[network].variables.JumpingPackageID}::nft::BlackSquidJumpingNFT`);
+    const found = data.data.find(data => data.data?.type === `${networkConfig[network].variables.Jumping.PackageID}::nft::BlackSquidJumpingNFT`);
     return found ? found.data?.objectId : (data.hasNextPage ? await getNFTID(owner, data.nextCursor) : undefined);
 }
 
@@ -31,36 +31,36 @@ export const newGameTx = createBetterTxFactory<{
     tx.setSender(params.sender);
     if (params.nftID) {
         tx.moveCall({
-            package: networkVariables.JumpingPackageID,
+            package: networkVariables.Jumping.PackageID,
             module: "data",
             function: "new_game",
             arguments: [
-                tx.object(networkVariables.DataPool),
+                tx.object(networkVariables.Jumping.DataPool),
                 tx.pure.id(params.nftID),
                 tx.pure.string(randomHashKey(params.sender)),
                 coinWithBalance({
                     balance: 10,
-                    type: `${networkVariables.PackageID}::gp::GP`
+                    type: `${networkVariables.GP.PackageID}::gp::GP`
                 })
             ]
         });
     } else {
         const [nft] = tx.moveCall({
-            package: networkVariables.JumpingPackageID,
+            package: networkVariables.Jumping.PackageID,
             module: "nft",
             function: "mint",
         });
         tx.moveCall({
-            package: networkVariables.JumpingPackageID,
+            package: networkVariables.Jumping.PackageID,
             module: "data",
             function: "new_game_with_nft",
             arguments: [
-                tx.object(networkVariables.DataPool),
+                tx.object(networkVariables.Jumping.DataPool),
                 nft,
                 tx.pure.string(randomHashKey(params.sender)),
                 coinWithBalance({
                     balance: 10,
-                    type: `${networkVariables.PackageID}::gp::GP`
+                    type: `${networkVariables.GP.PackageID}::gp::GP`
                 })
             ]
         });
@@ -74,7 +74,7 @@ export async function getGP(owner: string | undefined) {
         return "0";
     return (await suiClient.getBalance({
         owner,
-        coinType: `${networkConfig[network].variables.PackageID}::gp::GP`
+        coinType: `${networkConfig[network].variables.GP.PackageID}::gp::GP`
     })).totalBalance;
 }
 
@@ -130,7 +130,7 @@ export async function getStepsAndGames(owner: string | undefined, nftID: string 
     if (!owner || !nftID)
         return ["0", 3];
     const dataPool = await suiClient.getObject({
-        id: networkConfig[network].variables.DataPool,
+        id: networkConfig[network].variables.Jumping.DataPool,
         options: {
             showContent: true
         }
@@ -149,15 +149,15 @@ export const buyStepsTx = createBetterTxFactory<{
 }>((tx, networkVariables, params) => {
     tx.setSender(params.sender);
     tx.moveCall({
-        package: networkVariables.JumpingPackageID,
+        package: networkVariables.Jumping.PackageID,
         module: "data",
         function: "buy_steps",
         arguments: [
-            tx.object(networkVariables.DataPool),
+            tx.object(networkVariables.Jumping.DataPool),
             tx.pure.id(params.nftID),
             coinWithBalance({
                 balance: params.amount,
-                type: `${networkVariables.PackageID}::gp::GP`,
+                type: `${networkVariables.GP.PackageID}::gp::GP`,
             })
         ]
     });

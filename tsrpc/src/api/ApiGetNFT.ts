@@ -10,7 +10,7 @@ async function getNFTID(owner: string, cursor: string | null | undefined): Promi
             showType: true
         }
     });
-    const found = data.data.find(data => data.data?.type === `${networkConfig[network].variables.JumpingPackageID}::nft::BlackSquidJumpingNFT`);
+    const found = data.data.find(data => data.data?.type === `${networkConfig[network].variables.Jumping.PackageID}::nft::BlackSquidJumpingNFT`);
     return found ? found.data?.objectId : (data.hasNextPage ? await getNFTID(owner, data.nextCursor) : undefined);
 }
 

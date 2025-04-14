@@ -15,12 +15,12 @@ function hmacSHA256(pwd: string) {
 async function checkInMove(username: string, password: string, address: string) {
     const tx = new Transaction();
     tx.moveCall({
-        package: networkConfig[network].variables.PackageID,
+        package: networkConfig[network].variables.GP.PackageID,
         module: "user_info",
         function: "rebind",
         arguments: [
-            tx.object(networkConfig[network].variables.Publisher),
-            tx.object(networkConfig[network].variables.UserTable),
+            tx.object(networkConfig[network].variables.GP.Publisher),
+            tx.object(networkConfig[network].variables.GP.UserTable),
             tx.pure.address(address),
             tx.pure.string(username),
             tx.pure.string(hmacSHA256(password)),

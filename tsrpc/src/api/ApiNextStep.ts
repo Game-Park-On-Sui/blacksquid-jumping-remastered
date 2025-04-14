@@ -6,12 +6,12 @@ import {keypair, network, networkConfig, suiClient} from "../config/networkConfi
 export default async function (call: ApiCall<ReqNextStep, ResNextStep>) {
     const tx = new Transaction();
     tx.moveCall({
-        package: networkConfig[network].variables.JumpingPackageID,
+        package: networkConfig[network].variables.Jumping.PackageID,
         module: "data",
         function: "next_step",
         arguments: [
-            tx.object(networkConfig[network].variables.Publisher),
-            tx.object(networkConfig[network].variables.DataPool),
+            tx.object(networkConfig[network].variables.Jumping.Publisher),
+            tx.object(networkConfig[network].variables.Jumping.DataPool),
             tx.pure.id(call.req.nftID),
             tx.pure.string(call.req.hashKey),
             tx.pure.u8(Number(call.req.userPos)),
