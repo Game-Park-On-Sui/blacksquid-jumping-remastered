@@ -128,7 +128,7 @@ async function getUserInfo(id: string) {
 
 export async function getStepsAndGames(owner: string | undefined, nftID: string | null | undefined): Promise<[string, number]> {
     if (!owner || !nftID)
-        return ["0", 3];
+        return ["0", !owner ? 3 : 0];
     const dataPool = await suiClient.getObject({
         id: networkConfig[network].variables.Jumping.DataPool,
         options: {
