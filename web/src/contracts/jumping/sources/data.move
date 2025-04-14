@@ -163,3 +163,38 @@ entry fun next_step(
 public entry fun charity_invest(data_pool: &mut DataPool, gp: Coin<GP>) {
     data_pool.rewards.join(gp.into_balance());
 }
+
+entry fun withdraw(_: &Publisher, data_pool: &mut DataPool, amount: u64, ctx: &mut TxContext) {
+    transfer::public_transfer(data_pool.rewards.split(amount).into_coin(ctx), ctx.sender());
+}
+
+#[allow(lint(self_transfer))]
+public fun clear_user_info(data_pool: &mut DataPool, nft: BlackSquidJumpingNFT, ctx: &mut TxContext) {
+    let id = object::id(&nft);
+    let UserInfo {
+        mut steps,
+        mut hash_data
+    } = data_pool.pool_table.remove(id);
+    while (!hash_data.is_empty()) {
+        let (_, GameData {
+            list: _,
+            row: _,
+            end: _,
+            mut cur_step_paid,
+            mut final_reward
+        }) = hash_data.pop();
+        final_reward.join(cur_step_paid.withdraw_all());
+        if (final_reward.value() <= 20) {
+            data_pool.rewards.join(final_reward.withdraw_all());
+        } else {
+            let extra_reward_amount = (final_reward.value() - 20) / 10;
+            data_pool.rewards.join(final_reward.split(20 + extra_reward_amount));
+            steps.join(final_reward.withdraw_all());
+        };
+        cur_step_paid.destroy_zero();
+        final_reward.destroy_zero();
+    };
+    transfer::public_transfer(steps.into_coin(ctx), ctx.sender());
+    hash_data.destroy_empty();
+    nft.burn();
+}

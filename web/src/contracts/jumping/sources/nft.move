@@ -49,7 +49,7 @@ public fun mint_and_keep(ctx: &mut TxContext) {
     transfer::public_transfer(mint(ctx), ctx.sender());
 }
 
-public fun burn(nft: BlackSquidJumpingNFT) {
+public(package) fun burn(nft: BlackSquidJumpingNFT) {
     let BlackSquidJumpingNFT {
         id,
         name: _,

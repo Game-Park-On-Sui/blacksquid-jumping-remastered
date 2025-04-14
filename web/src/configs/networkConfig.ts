@@ -38,10 +38,10 @@ const {networkConfig, useNetworkVariable, useNetworkVariables} = createNetworkCo
                 UserTable: "0x55b6cccc67226ec748aa9f932705c01dd226db3b5aa9527b8ba968cd04114ee2"
             },
             Jumping: {
-                PackageID: "0x28266f075be366724c289dab92673e451d6720d515ba35c0a4c21498901fc387",
-                UpgradeCap: "0xc61b0f18d8aa13b72efba6b641b2b4fc0bf0e2c5c62a0ae3b33c1f8d32e9ab6c",
-                Publisher: "0x388a07bfa2f217a9b890065e75eceae4080ee8ac944a9655b581a47b4d03b564",
-                DataPool: "0x57118134c3742523600a09f8e4feef7e4d03b0f153b48caf33159025d44184e3"
+                PackageID: "0x2d8b96580273eb7ef54ad125afd9f04a132f35f074e8622147332fab6ad14298",
+                UpgradeCap: "0x5421d353ddd2ca23daf7a007464eff7da6fbf775f6e3e105b3d0bdfd469f38c4",
+                Publisher: "0x9e7cc43bcdf5ca4f4bcf7457ca67f358a91390ed7406b9ee571716fa3967d60c",
+                DataPool: "0x26a7abfff3edf5ccd18f3bccc21fc1af02ef7c74d6cbaab3d4997fc302dd5f5d"
             }
         }
     }
