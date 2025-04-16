@@ -245,10 +245,13 @@ export class SpikesManager extends Component {
     }
 
     rewriteInfo(info: GameInfoType) {
+        const needMatchPos = Math.abs(Number(this.curPosLabel.string) - Number(info.fields.value.fields.list)) > 1;
         this.curPosLabel.string = info.fields.value.fields.list.toString();
         this.curPosAwardLabel.string = info.fields.value.fields.cur_step_paid.toString();
         this.totalPosLabel.string = info.fields.value.fields.end.toString();
         this.totalAwardLabel.string = info.fields.value.fields.final_reward.toString();
+        if (needMatchPos)
+            this.handleNotMatchPos();
     }
 
     updateGameInfo() {
@@ -272,6 +275,43 @@ export class SpikesManager extends Component {
         const totalAward = Number(this.totalAwardLabel.string);
         const dx = Number(this.totalPosLabel.string) - Number(this.curPosLabel.string);
         return this.curList !== this.spikesCount ? Math.floor(curPosAward / 2) + Math.floor(totalAward / dx) : curPosAward + totalAward;
+    }
+
+    handleNotMatchPos() {
+        const curPos = Number(this.curPosLabel.string);
+        const totalPos = Number(this.totalPosLabel.string);
+        const lastPos = totalPos - curPos;
+        let i = 0, settled = 0;
+        while (settled < lastPos) {
+            const spike = this.spikes[i];
+            const pos = spike.getPosition();
+            if (pos.x > -6 && pos.x < 0) {
+                i++;
+                continue;
+            }
+            spike.setPosition(settled++, 0, 0);
+            this.isVisibleSpikes[i] = true;
+            this.spikesUpSpeed[i] = 0;
+            this.innerHiddenSpikes(spike);
+            i++;
+        }
+        while (i < 20) {
+            const spike = this.spikes[i];
+            const pos = spike.getPosition();
+            if (pos.x >= -6 && pos.x < lastPos) {
+                i++;
+                continue;
+            }
+            spike.setPosition(-6, 0, 0);
+            this.isVisibleSpikes[i] = false;
+            this.spikesUpSpeed[i] = 0;
+            this.innerHiddenSpikes(spike);
+            i++;
+        }
+        this.curList = curPos;
+        this.spikesCount = totalPos;
+        this.lastSpikePosX = lastPos - 1;
+        this.fixEndPlatformPos(this.lastSpikePosX + 1);
     }
 }
 
