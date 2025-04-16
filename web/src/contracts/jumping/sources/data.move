@@ -15,6 +15,7 @@ use sui::vec_map::{Self, VecMap};
 const E_Not_Valid_GP_Amount: u64 = 0;
 const E_Not_Enough_Steps: u64 = 1;
 const E_Not_Have_Empty_Game_Place: u64 = 2;
+const E_Not_Same_index: u64 = 3;
 
 public struct GameData has store {
     list: u64,
@@ -35,6 +36,12 @@ public struct DataPool has key {
     rewards: Balance<GP>
 }
 
+public struct EndlessGame has key {
+    id: UID,
+    idx: u8,
+    data: GameData
+}
+
 public struct StepResult has copy, drop {
     user_pos: u8,
     safe_pos: u8
@@ -46,6 +53,17 @@ fun init(ctx: &mut TxContext) {
         pool_table: table::new<ID, UserInfo>(ctx),
         rewards: balance::zero<GP>()
     });
+    transfer::share_object(EndlessGame {
+        id: object::new(ctx),
+        idx: 0,
+        data: GameData {
+            list: 0,
+            row: 0,
+            end: 100,
+            cur_step_paid: balance::zero<GP>(),
+            final_reward: balance::zero<GP>()
+        }
+    })
 }
 
 public fun new_game(data_pool: &mut DataPool, nft_id: ID, hash_key: String, gp: Coin<GP>) {
@@ -150,6 +168,47 @@ entry fun next_step(
         // check if can end the game
         if (data.list == data.end) {
             drop_game_data(data_pool, nft_id, hash_key);
+        };
+    } else {
+        data.end = data.end + 1;
+    };
+    event::emit(StepResult {
+        user_pos,
+        safe_pos,
+    });
+}
+
+fun reset_endless_game(endless_game: &mut EndlessGame) {
+    endless_game.idx = (endless_game.idx + 1) % 100;
+    endless_game.data.list = 0;
+    endless_game.data.row = 0;
+    endless_game.data.end = 100;
+}
+
+entry fun endless_next_step(
+    _: &Publisher,
+    data_pool: &mut DataPool,
+    nft_id: ID,
+    endless_game: &mut EndlessGame,
+    endless_idx: u8,
+    user_pos: u8,
+    random: &Random,
+    receipt: address,
+    ctx: &mut TxContext)
+{
+    let user_info = &mut data_pool.pool_table[nft_id];
+    assert!(user_info.steps.value() > 0, E_Not_Enough_Steps);
+    assert!(endless_game.idx == endless_idx, E_Not_Same_index);
+    let data = &mut endless_game.data;
+    data.cur_step_paid.join(user_info.steps.split(1));
+
+    let safe_pos = rand_num(random, ctx);
+    // success
+    if (user_pos == safe_pos) {
+        distribute_step_rewards(data, user_pos, receipt, ctx);
+        // check if can end the game
+        if (data.list == data.end) {
+            reset_endless_game(endless_game);
         };
     } else {
         data.end = data.end + 1;
