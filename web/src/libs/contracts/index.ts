@@ -163,3 +163,18 @@ export const buyStepsTx = createBetterTxFactory<{
     });
     return tx;
 });
+
+export const clearDataTx = createBetterTxFactory<{
+    nftID: string
+}>((tx, networkVariables, params) => {
+    tx.moveCall({
+        package: networkVariables.Jumping.PackageID,
+        module: "data",
+        function: "clear_user_info",
+        arguments: [
+            tx.object(networkVariables.Jumping.DataPool),
+            tx.object(params.nftID)
+        ]
+    });
+    return tx;
+})

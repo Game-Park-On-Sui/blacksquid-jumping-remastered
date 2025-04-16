@@ -4,7 +4,7 @@ import {useBetterSignAndExecuteTransaction, useMediaSize} from "@/hooks";
 import "@/app/page.css"
 import {RefreshCw} from "lucide-react";
 import {CustomSuiButton, Waiting} from "@/components";
-import {buyStepsTx, newGameTx} from "@/libs/contracts";
+import {buyStepsTx, clearDataTx, newGameTx} from "@/libs/contracts";
 import {ChangeEvent, useContext, useEffect, useState} from "react";
 import {UserContext} from "@/contexts";
 
@@ -13,7 +13,7 @@ export default function Home() {
     const userInfo = useContext(UserContext);
     const [isWaiting, setIsWaiting] = useState<boolean>(false);
     const [inputSteps, setInputSteps] = useState<string>("");
-    const [timerID, setTimerID] = useState<NodeJS.Timeout>();
+    const [timerID, setTimerID] = useState<number>();
 
     const changeInputSteps = (e: ChangeEvent<HTMLInputElement>) => {
         const amount = e.target.value;
@@ -49,7 +49,7 @@ export default function Home() {
             console.error(err);
             setIsWaiting(false);
         }).onSuccess(() => {
-            userInfo.refreshInfo();
+            userInfo.refreshInfo(!userInfo.nftID);
             setIsWaiting(false);
         }).onExecute();
     }
@@ -71,7 +71,27 @@ export default function Home() {
             console.error(err);
             setIsWaiting(false);
         }).onSuccess(() => {
-            userInfo.refreshInfo();
+            userInfo.refreshInfo(false);
+            setIsWaiting(false);
+        }).onExecute();
+    }
+
+    const {handleSignAndExecuteTransaction: clearData} = useBetterSignAndExecuteTransaction({
+        tx: clearDataTx,
+        waitForTx: true
+    });
+    const handleClickClearData = async () => {
+        if (!userInfo.nftID || isWaiting)
+            return;
+        await clearData({
+            nftID: userInfo.nftID
+        }).beforeExecute(() => {
+            setIsWaiting(true);
+        }).onError(err => {
+            console.error(err);
+            setIsWaiting(false);
+        }).onSuccess(() => {
+            userInfo.refreshInfo(true);
             setIsWaiting(false);
         }).onExecute();
     }
@@ -116,13 +136,14 @@ export default function Home() {
                             <RefreshCw
                                 className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]"
                                 size={12}
-                                onClick={userInfo.refreshInfo}
+                                onClick={() => userInfo.refreshInfo(false)}
                             />
                         </div>
                         <hr className="w-full border-[#041f4b]" />
                     </div>
                     <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]">Market</span>
                     <span className={userInfo.canAddNewGame ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickNewGame}>NewGame</span>
+                    <span className={userInfo.nftID ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickClearData}>ClearData</span>
                     <div className="flex flex-col gap-1 items-center">
                         <input className="w-full font-bold focus:outline-none text-center px-1" placeholder="input steps" value={inputSteps} onChange={changeInputSteps}/>
                         <span className={canBuySteps() ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickBuySteps}>BuySteps</span>

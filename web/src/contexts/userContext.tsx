@@ -1,6 +1,6 @@
 'use client'
 
-import {createContext, ReactNode, useEffect, useState} from "react";
+import {createContext, ReactNode, useCallback, useEffect, useState} from "react";
 import {useCurrentAccount, useResolveSuiNSName} from "@mysten/dapp-kit";
 import {getGP, getNFTID, getStepsAndGames} from "@/libs/contracts";
 
@@ -12,7 +12,7 @@ type UserInfoType = {
     gp: string | null | undefined,
     steps: string | null | undefined,
     canAddNewGame: boolean,
-    refreshInfo: () => void
+    refreshInfo: (reset: boolean) => void
 }
 
 export const UserContext = createContext<UserInfoType>({
@@ -33,7 +33,10 @@ export default function UserContextProvider({children}: {children: ReactNode}) {
     const [gp, setGp] = useState<string>("");
     const [steps, setSteps] = useState<string>("");
     const [canAddNewGame, setCanAddNewGame] = useState<boolean>(false);
-    useEffect(() => {
+    const resetNFT = useCallback(() => {
+        setNftID(null);
+        setSteps("");
+        setCanAddNewGame(false);
         getNFTID(account?.address, null).then(nftID => {
             setNftID(nftID);
             getStepsAndGames(account?.address, nftID).then(data => {
@@ -41,10 +44,17 @@ export default function UserContextProvider({children}: {children: ReactNode}) {
                 setCanAddNewGame(data[1] < 2);
             });
         });
-        getGP(account?.address).then(gp => setGp(gp));
     }, [account]);
-    const refreshInfo = () => {
+    useEffect(() => {
         getGP(account?.address).then(gp => setGp(gp));
+        resetNFT();
+    }, [account]);
+    const refreshInfo = (reset: boolean) => {
+        getGP(account?.address).then(gp => setGp(gp));
+        if (reset) {
+            resetNFT();
+            return;
+        }
         getStepsAndGames(account?.address, nftID).then(data => {
             setSteps(data[0]);
             setCanAddNewGame(data[1] < 2);
