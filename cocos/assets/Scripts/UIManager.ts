@@ -84,5 +84,11 @@ export class UIManager extends Component {
         TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
         TsrpcManager.instance.getEndlessGameInfo().then(info => this.chooseGame.getComponent(ChooseGame).updateEndlessGameInfo(info));
     }
+
+    handleBackToChooseGame() {
+        this.chooseGame.active = true;
+        this.chooseGame.parent.active = true;
+        this.refreshGameInfo();
+    }
 }
 
