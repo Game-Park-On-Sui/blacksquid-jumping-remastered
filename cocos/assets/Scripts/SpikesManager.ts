@@ -3,6 +3,7 @@ import {Player} from "db://assets/Scripts/Player";
 import {ReStartButton} from "db://assets/Scripts/ReStartButton";
 import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
 import {TipsTimeout} from "db://assets/Scripts/TipsTimeout";
+import {GameInfoType} from "db://assets/Scripts/tsrpc/protocols/PtlGetGameInfo";
 
 const {ccclass, property} = _decorator;
 
@@ -243,18 +244,27 @@ export class SpikesManager extends Component {
         this.gameHashKey = hashKey;
     }
 
+    rewriteInfo(info: GameInfoType) {
+        this.curPosLabel.string = info.fields.value.fields.list.toString();
+        this.curPosAwardLabel.string = info.fields.value.fields.cur_step_paid.toString();
+        this.totalPosLabel.string = info.fields.value.fields.end.toString();
+        this.totalAwardLabel.string = info.fields.value.fields.final_reward.toString();
+    }
+
     updateGameInfo() {
         const address = localStorage.getItem("address");
         const nftID = localStorage.getItem("nftID");
-        TsrpcManager.instance.getGameInfo(address, nftID).then(ret => {
-            const info = ret.find(info => info.fields.key === this.gameHashKey);
-            if (info) {
-                this.curPosLabel.string = info.fields.value.fields.list.toString();
-                this.curPosAwardLabel.string = info.fields.value.fields.cur_step_paid.toString();
-                this.totalPosLabel.string = info.fields.value.fields.end.toString();
-                this.totalAwardLabel.string = info.fields.value.fields.final_reward.toString();
-            }
-        });
+        if (this.gameHashKey.length > 3) {
+            TsrpcManager.instance.getGameInfo(address, nftID).then(ret => {
+                const info = ret.find(info => info.fields.key === this.gameHashKey);
+                if (info)
+                    this.rewriteInfo(info);
+            });
+        } else {
+            TsrpcManager.instance.getEndlessGameInfo().then(info => {
+                this.rewriteInfo(info);
+            });
+        }
     }
 
     calcAward() {

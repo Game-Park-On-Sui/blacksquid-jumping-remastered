@@ -64,6 +64,7 @@ export class UIManager extends Component {
         TsrpcManager.instance.getNFTID(address).then(nftID => {
             localStorage.setItem("nftID", nftID);
             TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
+            TsrpcManager.instance.getEndlessGameInfo().then(info => this.chooseGame.getComponent(ChooseGame).updateEndlessGameInfo(info));
         });
     }
 
@@ -76,10 +77,12 @@ export class UIManager extends Component {
                     return;
                 localStorage.setItem("nftID", nftID);
                 TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
+                TsrpcManager.instance.getEndlessGameInfo().then(info => this.chooseGame.getComponent(ChooseGame).updateEndlessGameInfo(info));
             });
             return;
         }
         TsrpcManager.instance.getGameInfo(address, nftID).then(info => this.chooseGame.getComponent(ChooseGame).updateGameInfo(info));
+        TsrpcManager.instance.getEndlessGameInfo().then(info => this.chooseGame.getComponent(ChooseGame).updateEndlessGameInfo(info));
     }
 }
 

@@ -34,7 +34,10 @@ export class ChooseGame extends Component {
         const len = info.length;
         this.game1.updateLabel(len > 0 ? info[0] : null);
         this.game2.updateLabel(len > 1 ? info[1] : null);
-        this.endLess.updateLabel(null);
+    }
+
+    updateEndlessGameInfo(info: GameInfoType) {
+        this.endLess.updateLabel(info);
     }
 }
 

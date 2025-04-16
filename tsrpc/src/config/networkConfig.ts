@@ -22,7 +22,8 @@ export const networkConfig = {
                 PackageID: "",
                 UpgradeCap: "",
                 Publisher: "",
-                DataPool: ""
+                DataPool: "",
+                EndlessGame: ""
             }
         }
     },

@@ -1,4 +1,5 @@
 import { ServiceProto } from 'tsrpc-proto';
+import { ReqGetEndlessGameInfo, ResGetEndlessGameInfo } from './PtlGetEndlessGameInfo';
 import { ReqGetGameInfo, ResGetGameInfo } from './PtlGetGameInfo';
 import { ReqGetNFT, ResGetNFT } from './PtlGetNFT';
 import { ReqLogin, ResLogin } from './PtlLogin';
@@ -6,6 +7,10 @@ import { ReqNextStep, ResNextStep } from './PtlNextStep';
 
 export interface ServiceType {
     api: {
+        "GetEndlessGameInfo": {
+            req: ReqGetEndlessGameInfo,
+            res: ResGetEndlessGameInfo
+        },
         "GetGameInfo": {
             req: ReqGetGameInfo,
             res: ResGetGameInfo
@@ -29,8 +34,13 @@ export interface ServiceType {
 }
 
 export const serviceProto: ServiceProto<ServiceType> = {
-    "version": 6,
+    "version": 7,
     "services": [
+        {
+            "id": 4,
+            "name": "GetEndlessGameInfo",
+            "type": "api"
+        },
         {
             "id": 1,
             "name": "GetGameInfo",
@@ -53,37 +63,18 @@ export const serviceProto: ServiceProto<ServiceType> = {
         }
     ],
     "types": {
-        "PtlGetGameInfo/ReqGetGameInfo": {
-            "type": "Interface",
-            "properties": [
-                {
-                    "id": 0,
-                    "name": "address",
-                    "type": {
-                        "type": "String"
-                    }
-                },
-                {
-                    "id": 1,
-                    "name": "nftID",
-                    "type": {
-                        "type": "String"
-                    }
-                }
-            ]
+        "PtlGetEndlessGameInfo/ReqGetEndlessGameInfo": {
+            "type": "Interface"
         },
-        "PtlGetGameInfo/ResGetGameInfo": {
+        "PtlGetEndlessGameInfo/ResGetEndlessGameInfo": {
             "type": "Interface",
             "properties": [
                 {
                     "id": 0,
-                    "name": "gameInfo",
+                    "name": "endlessGameInfo",
                     "type": {
-                        "type": "Array",
-                        "elementType": {
-                            "type": "Reference",
-                            "target": "PtlGetGameInfo/GameInfoType"
-                        }
+                        "type": "Reference",
+                        "target": "PtlGetGameInfo/GameInfoType"
                     }
                 }
             ]
@@ -228,6 +219,41 @@ export const serviceProto: ServiceProto<ServiceType> = {
                                 }
                             }
                         ]
+                    }
+                }
+            ]
+        },
+        "PtlGetGameInfo/ReqGetGameInfo": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "address",
+                    "type": {
+                        "type": "String"
+                    }
+                },
+                {
+                    "id": 1,
+                    "name": "nftID",
+                    "type": {
+                        "type": "String"
+                    }
+                }
+            ]
+        },
+        "PtlGetGameInfo/ResGetGameInfo": {
+            "type": "Interface",
+            "properties": [
+                {
+                    "id": 0,
+                    "name": "gameInfo",
+                    "type": {
+                        "type": "Array",
+                        "elementType": {
+                            "type": "Reference",
+                            "target": "PtlGetGameInfo/GameInfoType"
+                        }
                     }
                 }
             ]

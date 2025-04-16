@@ -38,6 +38,10 @@ export class TsrpcManager {
         })).res.gameInfo;
     }
 
+    async getEndlessGameInfo() {
+        return (await this._apiClient.callApi("GetEndlessGameInfo", {})).res.endlessGameInfo;
+    }
+
     async handleNextStep(nftID: string, hashKey: string, userPos: number, receipt: string) {
         const res = (await this._apiClient.callApi("NextStep", {
             nftID,
