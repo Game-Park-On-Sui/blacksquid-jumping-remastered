@@ -1,9 +1,10 @@
-import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch, Label, Color} from 'cc';
+import {_decorator, Component, Node, CCInteger, instantiate, Mesh, MeshRenderer, EventTouch, Label, Color, AudioClip} from 'cc';
 import {Player} from "db://assets/Scripts/Player";
 import {ReStartButton} from "db://assets/Scripts/ReStartButton";
 import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
 import {TipsTimeout} from "db://assets/Scripts/TipsTimeout";
 import {GameInfoType} from "db://assets/Scripts/tsrpc/protocols/PtlGetGameInfo";
+import {AudioManager} from "db://assets/Scripts/AudioManager";
 
 const {ccclass, property} = _decorator;
 
@@ -35,6 +36,10 @@ export class SpikesManager extends Component {
     restartButton: ReStartButton = null;
     @property({type: Node})
     tips: Node = null;
+    @property({type: AudioClip})
+    successMusic: AudioClip = null;
+    @property({type: AudioClip})
+    failureMusic: AudioClip = null;
 
     private spikes: Node[] = [];
     private isVisibleSpikes: boolean[] = [];
@@ -172,6 +177,7 @@ export class SpikesManager extends Component {
                 if (this.isVisibleSpikes[i])
                     this.isVisibleSpikes[i] = Math.round(this.spikes[i].getPosition().x) !== -6;
             this.checkWin();
+            AudioManager.inst.playOneShot(this.successMusic, 1);
             return;
         }
         this.ChangeMoveDirection(1);
@@ -179,7 +185,9 @@ export class SpikesManager extends Component {
         this.timer = this.player.getJumpDuration();
         this.killOne = -1;
         this.player.die(this.oldRow);
-        this.spikesCount++;
+        if (asAlive)
+            this.spikesCount++;
+        AudioManager.inst.playOneShot(this.failureMusic, 1);
     }
 
     moveSpikesToEnd() {

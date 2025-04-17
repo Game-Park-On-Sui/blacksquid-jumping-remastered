@@ -1,7 +1,8 @@
-import {_decorator, Component, Node, EditBox, Label} from 'cc';
+import {_decorator, Component, Node, EditBox, Label, AudioClip} from 'cc';
 import {SpikesManager} from "db://assets/Scripts/SpikesManager";
 import {TsrpcManager} from "db://assets/Scripts/TsrpcManager";
 import {ChooseGame} from "db://assets/Scripts/ChooseGame";
+import {AudioManager} from "db://assets/Scripts/AudioManager";
 
 const {ccclass, property} = _decorator;
 
@@ -23,8 +24,11 @@ export class UIManager extends Component {
     addressEditBox: EditBox = null;
     @property({type: Label})
     confirmLabel: Label = null;
+    @property({type: AudioClip})
+    gameBg: AudioClip = null;
 
     start() {
+        AudioManager.inst.play(this.gameBg, true, 0.3);
         this.readStorage();
     }
 

@@ -1880,6 +1880,14 @@
     "tips": {
       "__id__": 381
     },
+    "successMusic": {
+      "__uuid__": "70c1fb39-8e91-4f32-aa5a-7ac918d4a92d",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "failureMusic": {
+      "__uuid__": "c77ae1eb-820e-4aa3-920f-bdc210c9c512",
+      "__expectedType__": "cc.AudioClip"
+    },
     "_id": "6aN717Q05Gu47nFSB9q+el"
   },
   {
@@ -3671,6 +3679,10 @@
     },
     "confirmLabel": {
       "__id__": 228
+    },
+    "gameBg": {
+      "__uuid__": "8b9da6d6-d08f-4a39-9318-add64521315c",
+      "__expectedType__": "cc.AudioClip"
     },
     "_id": "e4nxqyUMdKzpl3XhjX5jbq"
   },
