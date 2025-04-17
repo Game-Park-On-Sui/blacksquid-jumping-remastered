@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "BlackSquid Jumping: Remastered",
     description: "BlackSquid Jumping: Remastered",
-    icons: "/BlackSquid-Removebg.png"
+    icons: `${process.env.NEXT_PUBLIC_AGGREGATOR}/XDRQ-jpUnIi8gLCg__Q7Fo5DoeDQmV4E0ggkEPM0lVc`
 };
 
 export default function RootLayout({children}: Readonly<{ children: ReactNode }>) {

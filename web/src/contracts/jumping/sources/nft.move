@@ -40,7 +40,7 @@ public fun mint(ctx: &mut TxContext): BlackSquidJumpingNFT {
     BlackSquidJumpingNFT {
         id: object::new(ctx),
         name: b"BlackSquidJumpingNFT".to_string(),
-        image_url: b"https://github.com/zcy1024/blacksquid-jumping-remastered/tree/main/web/public/BlackSquid.jpg?raw=true".to_string(),
+        image_url: b"https://mainnet-aggregator.hoh.zone/v1/blobs/rENqmzgtslP-fdRKvIDADRPw1w9oyT-uQQOhJ4M3MgU".to_string(),
     }
 }
 

@@ -117,7 +117,7 @@ export default function Home() {
         }}>
             <div className="absolute w-full h-full border border-blue-600 rounded-full opacity-20 -z-50 overflow-hidden">
                 <div className="fixed w-full h-full animate-move">
-                    <div className="w-full h-full bg-[url(/BlackSquid-Removebg.png)] bg-contain bg-no-repeat bg-center animate-rotate"></div>
+                    <div className="w-full h-full bg-[url(https://mainnet-aggregator.hoh.zone/v1/blobs/XDRQ-jpUnIi8gLCg__Q7Fo5DoeDQmV4E0ggkEPM0lVc)] bg-contain bg-no-repeat bg-center animate-rotate"></div>
                 </div>
             </div>
             <div className="absolute w-[960px] h-[540px] 2xl:w-[1280px] 2xl:h-[720px]  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
