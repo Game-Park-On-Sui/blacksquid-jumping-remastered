@@ -2,8 +2,8 @@
 
 import {useBetterSignAndExecuteTransaction, useMediaSize} from "@/hooks";
 import "@/app/page.css"
-import {RefreshCw} from "lucide-react";
-import {CustomSuiButton, Waiting} from "@/components";
+import {Info, RefreshCw} from "lucide-react";
+import {CustomSuiButton, ReadingInfo, Waiting} from "@/components";
 import {buyStepsTx, clearDataTx, newGameTx} from "@/libs/contracts";
 import {ChangeEvent, useContext, useEffect, useState} from "react";
 import {UserContext} from "@/contexts";
@@ -14,6 +14,7 @@ export default function Home() {
     const [isWaiting, setIsWaiting] = useState<boolean>(false);
     const [inputSteps, setInputSteps] = useState<string>("");
     const [timerID, setTimerID] = useState<number>();
+    const [isReadingInfo, setIsReadingInfo] = useState<boolean>(false);
 
     const changeInputSteps = (e: ChangeEvent<HTMLInputElement>) => {
         const amount = e.target.value;
@@ -152,8 +153,12 @@ export default function Home() {
                         <span>GP: {userInfo.gp}</span>
                         <span>Steps: {userInfo.steps}</span>
                     </div>
+                    <Info className="absolute bottom-1 right-1 cursor-pointer text-[#196ae3] hover:text-[#35aaf7]"
+                          size={20}
+                          onClick={() => setIsReadingInfo(true)} />
                 </div>
             </div>
+            {isReadingInfo && <ReadingInfo setIsReadingInfo={setIsReadingInfo} />}
             {isWaiting && <Waiting />}
         </div>
     );
