@@ -107,6 +107,13 @@ export default function Home() {
         }
     }, [userInfo.account, userInfo.nftID]);
 
+    useEffect(() => {
+        if (!localStorage.getItem("notFirst")) {
+            setIsReadingInfo(true);
+            localStorage.setItem("notFirst", "true");
+        }
+    }, []);
+
     return (
         <div style={{
             position: 'relative',
