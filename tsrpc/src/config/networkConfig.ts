@@ -39,11 +39,11 @@ export const networkConfig = {
                 UserTable: "0x9424be761fd89f5d2c6615536f1747f45ac6c3ad60e7f90f2f92744ad5d6752f"
             },
             Jumping: {
-                PackageID: "0xb946d43d5da24db1e205735312e82c181d81d2e44bf03ca88aca62e4bfa72c7c",
-                UpgradeCap: "0x92f9a9692962a32f877a99758ff9ed80074b71d0834412f1655f6ac0ebc4fa81",
-                Publisher: "0xb372b1bc5c33e89496590f2c321b7c15431e270dae659651c5acfa1b2a57900a",
-                DataPool: "0xabc08bb95e96361780ed603fd969a88512440411796fdc11aa953a0798c1033b",
-                EndlessGame: "0x88d3d456f109ef555648b9f1cd5533531d8482e508e24a2a66982a54a835faa0"
+                PackageID: "0x5da4fca2f86ccaf4b3b6a9564c851b89708e82797c982878de74133c14d1305f",
+                UpgradeCap: "0xa47f58cfc344355e06bfa2436177954b5845334bf715550ecc1ed615b4744b98",
+                Publisher: "0xd8e658f23e0657b0c51da0e21c4b67f5133595fae0927665b344d588d5bda79d",
+                DataPool: "0xc9cdae81c480d7bf7215043a1a875f4c51a06f7f8ce0fbd687e4780b3396bde3",
+                EndlessGame: "0xfac108a3a4f559feb02da45cf080f6a6fc4d70d54a3c23cbb2966535e207ca58"
             }
         }
     }
