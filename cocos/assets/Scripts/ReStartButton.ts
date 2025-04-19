@@ -9,8 +9,8 @@ export class ReStartButton extends Component {
     @property({type: Label})
     buttonLabel: Label = null;
 
-    showReStart(award: number) {
-        this.awardNode.getComponent(Label).string = "Award: " + award;
+    showReStart(label: number | string) {
+        this.awardNode.getComponent(Label).string = label.toString();
         this.awardNode.active = true;
         this.buttonLabel.string = "Restart";
         this.node.active = true;

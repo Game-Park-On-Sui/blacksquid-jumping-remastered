@@ -130,8 +130,20 @@ export class SpikesManager extends Component {
         this.endPlatform.setPosition(this.endPlatform.getPosition().x + this.direction * this.speed * deltaTime * (canMoveEndPlatform ? 1 : (this.direction === -1 ? 0 : 2)), 0, 0);
     }
 
-    lateUpdate() {
-        this.moveSpikesToEnd();
+    lateUpdate(deltaTime: number) {
+        const spike = this.spikes.find(spike => spike.getPosition().y < 0);
+        if (!spike)
+            return;
+        const spikePos = spike.getPosition();
+        let targetY = spikePos.y + deltaTime * 2;
+        const endPlatformPos = this.endPlatform.getPosition();
+        let targetX = endPlatformPos.x + deltaTime;
+        if (targetY >= 0) {
+            targetY = 0;
+            targetX = Math.round(targetX);
+        }
+        spike.setPosition(spikePos.x, targetY, 0);
+        this.endPlatform.setPosition(targetX, 0, 0);
     }
 
     ChangeMoveDirection(direction: 1 | -1) {
@@ -168,7 +180,6 @@ export class SpikesManager extends Component {
     }
 
     checkAlive(asAlive: boolean = true) {
-        this.updateGameInfo();
         if (asAlive && this.curRow != this.killOne) {
             this.oldRow = this.curRow;
             this.curList++;
@@ -176,7 +187,7 @@ export class SpikesManager extends Component {
             for (let i = 0; i < 20; i++)
                 if (this.isVisibleSpikes[i])
                     this.isVisibleSpikes[i] = Math.round(this.spikes[i].getPosition().x) !== -6;
-            this.checkWin();
+            this.updateGameInfo(true);
             AudioManager.inst.playOneShot(this.successMusic, 1);
             return;
         }
@@ -187,6 +198,7 @@ export class SpikesManager extends Component {
         this.player.die(this.oldRow);
         if (asAlive)
             this.spikesCount++;
+        this.scheduleOnce(() => this.updateGameInfo(false), this.timer);
         AudioManager.inst.playOneShot(this.failureMusic, 1);
     }
 
@@ -202,7 +214,9 @@ export class SpikesManager extends Component {
             spike.setPosition(this.lastSpikePosX + 1, -2, 0);
             this.innerHiddenSpikes(spike);
             this.isVisibleSpikes[idx] = true;
-            this.spikesUpSpeed[idx] = 2 / (this.timer > 0 ? this.timer : this.player.getJumpDuration());
+            // don't need it to move up
+            // this.spikesUpSpeed[idx] = 2 / (this.timer > 0 ? this.timer : this.player.getJumpDuration());
+            this.spikesUpSpeed[idx] = 0;
             this.fixEndPlatformPos(this.lastSpikePosX + 1);
         }
     }
@@ -225,7 +239,7 @@ export class SpikesManager extends Component {
             this.tips.getComponent(TipsTimeout).delayToHide("Award: " + award, Color.GREEN, 1);
             return;
         }
-        this.restartButton.showReStart(award);
+        this.restartButton.showReStart(`Award: ${award}`);
     }
 
     handleStart(curPos: number, curPosAward: number, totalPos: number, totalAward: number, hashKey: string) {
@@ -253,7 +267,7 @@ export class SpikesManager extends Component {
     }
 
     rewriteInfo(info: GameInfoType) {
-        const needMatchPos = Math.abs(Number(this.curPosLabel.string) - Number(info.fields.value.fields.list)) > 1;
+        const needMatchPos = Number(this.curList) != Number(info.fields.value.fields.list) || Number(this.spikesCount) != Number(info.fields.value.fields.end);
         this.curPosLabel.string = info.fields.value.fields.list.toString();
         this.curPosAwardLabel.string = info.fields.value.fields.cur_step_paid.toString();
         this.totalPosLabel.string = info.fields.value.fields.end.toString();
@@ -262,18 +276,29 @@ export class SpikesManager extends Component {
             this.handleNotMatchPos();
     }
 
-    updateGameInfo() {
+    updateGameInfo(needCheckWin: boolean) {
         const address = localStorage.getItem("address");
         const nftID = localStorage.getItem("nftID");
         if (this.gameHashKey.length > 3) {
             TsrpcManager.instance.getGameInfo(address, nftID).then(ret => {
                 const info = ret.find(info => info.fields.key === this.gameHashKey);
-                if (info)
-                    this.rewriteInfo(info);
+                if (!info) {
+                    this.tips.active = true;
+                    this.tips.getComponent(TipsTimeout).delayToHide("Please Check Your $GP", Color.GREEN, 1);
+                    this.scheduleOnce(() => this.restartButton.showReStart("Game Over"), 1);
+                    return;
+                }
+                this.rewriteInfo(info);
+                if (needCheckWin)
+                    this.checkWin();
+                this.moveSpikesToEnd();
             });
         } else {
             TsrpcManager.instance.getEndlessGameInfo().then(info => {
                 this.rewriteInfo(info);
+                if (needCheckWin)
+                    this.checkWin();
+                this.moveSpikesToEnd();
             });
         }
     }
