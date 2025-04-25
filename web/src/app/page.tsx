@@ -149,7 +149,9 @@ export default function Home() {
                         </div>
                         <hr className="w-full border-[#041f4b]" />
                     </div>
-                    <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]">Market</span>
+                    <span className="cursor-pointer text-[#196ae3] hover:text-[#35aaf7]">
+                        <a href="https://game-park-market.vercel.app/" target="_blank" rel="noopener noreferrer">Market</a>
+                    </span>
                     <span className={userInfo.canAddNewGame ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickNewGame}>NewGame</span>
                     <span className={userInfo.nftID ? "cursor-pointer text-[#196ae3] hover:text-[#35aaf7]" : "text-[#afb3b5]"} onClick={handleClickClearData}>ClearData</span>
                     <div className="flex flex-col gap-1 items-center">
