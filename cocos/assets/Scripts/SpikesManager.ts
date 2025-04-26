@@ -232,14 +232,14 @@ export class SpikesManager extends Component {
         this.endPlatform.setPosition(fixedX, 0, 0);
     }
 
-    checkWin() {
-        const award = this.calcAward();
+    checkWin(award: number) {
+        // const award = this.calcAward();
         if (this.curList !== this.spikesCount) {
             this.tips.active = true;
-            this.tips.getComponent(TipsTimeout).delayToHide("Award: " + award, Color.GREEN, 1);
+            this.tips.getComponent(TipsTimeout).delayToHide(award > -1 ? "Award: " + award : "Check Your Award!", Color.GREEN, 1);
             return;
         }
-        this.restartButton.showReStart(`Award: ${award}`);
+        this.restartButton.showReStart(award > -1 ? "Award: " + award : "Check Your Award!");
     }
 
     handleStart(curPos: number, curPosAward: number, totalPos: number, totalAward: number, hashKey: string) {
@@ -288,16 +288,22 @@ export class SpikesManager extends Component {
                     this.scheduleOnce(() => this.restartButton.showReStart("Game Over"), 1);
                     return;
                 }
+                let award = this.calcAward();
+                if (Number(this.curPosLabel.string) + 1 != Number(info.fields.value.fields.list))
+                    award = -1;
                 this.rewriteInfo(info);
                 if (needCheckWin)
-                    this.checkWin();
+                    this.checkWin(award);
                 this.moveSpikesToEnd();
             });
         } else {
             TsrpcManager.instance.getEndlessGameInfo().then(info => {
+                let award = this.calcAward();
+                if (Number(this.curPosLabel.string) + 1 != Number(info.fields.value.fields.list))
+                    award = -1;
                 this.rewriteInfo(info);
                 if (needCheckWin)
-                    this.checkWin();
+                    this.checkWin(award);
                 this.moveSpikesToEnd();
             });
         }
